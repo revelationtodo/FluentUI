@@ -1,4 +1,4 @@
-#include "FluVScrollView.h"
+﻿#include "FluVScrollView.h"
 
 FluVScrollView::FluVScrollView(QWidget* parent /*= nullptr*/) : FluScrollArea(parent)
 {
@@ -12,7 +12,7 @@ FluVScrollView::FluVScrollView(QWidget* parent /*= nullptr*/) : FluScrollArea(pa
     m_vMainLayout = new QVBoxLayout(m_contextWidget);
     m_contextWidget->setObjectName("contextWidget");
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVScrollView.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
@@ -27,12 +27,5 @@ QVBoxLayout* FluVScrollView::getMainLayout()
 
 void FluVScrollView::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVScrollView.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluVScrollView.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluVScrollView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

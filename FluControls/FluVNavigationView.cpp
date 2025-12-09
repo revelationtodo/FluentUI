@@ -1,12 +1,14 @@
-#include "FluVNavigationView.h"
+﻿#include "FluVNavigationView.h"
 #include "FluVNavigationIconTextItem.h"
 #include "FluVNavigationMenuItem.h"
 #include "../FluUtils/FluUtils.h"
 #include "FluVNavigationSettingsItem.h"
 #include "FluVNavigationSearchItem.h"
+#include <QResizeEvent>
 
 FluVNavigationView::FluVNavigationView(QWidget *parent /*= nullptr*/) : FluWidget(parent)
 {
+    m_nViewWidth = 320;  // default width
     m_vLayout = new QVBoxLayout(this);
     m_vLayout->setContentsMargins(4, 0, 4, 0);
     m_topWrapWidget = new QWidget(this);
@@ -35,34 +37,70 @@ FluVNavigationView::FluVNavigationView(QWidget *parent /*= nullptr*/) : FluWidge
     m_midVScrollView->setObjectName("widget2");
     m_bottomWrapWidget->setObjectName("widget3");
 
-    auto menuButtonItem = new FluVNavigationMenuItem(this);
-    m_vTopWrapLayout->addWidget(menuButtonItem);
+    m_menuButtonItem = new FluVNavigationMenuItem(this);
+    m_vTopWrapLayout->addWidget(m_menuButtonItem);
 
-    auto searchItem = new FluVNavigationSearchItem;
-    // m_vTopWrapLayout->addWidget(searchItem);
-
-    //QString qss = FluStyleSheetUitls::getQssByFileName("/resources/qss/light/FluVNavigationView.qss");
-    //setStyleSheet(qss);
+    m_searchItem = new FluVNavigationSearchItem;
+    m_vTopWrapLayout->addWidget(m_searchItem);
 
     m_bLong = true;
-    setFixedWidth(220 + 10);
+    setFixedWidth(m_nViewWidth);
 
-    //onThemeChanged();
-    connect(menuButtonItem, &FluVNavigationMenuItem::menuItemClicked, [=]() { onMenuItemClicked(); });
-    connect(searchItem, &FluVNavigationSearchItem::itemClicked, [=]() { onMenuItemClicked(); });
+    // ani;
+    m_animation = new QPropertyAnimation;
+    m_animation->setDuration(100);
+    m_animation->setPropertyName("value");
 
-   // style()->polish(this);
+    m_valueObject = new FluValueObject;
+    m_animation->setTargetObject(m_valueObject);
+    m_animation->setStartValue(width());
+    m_animation->setEndValue(40);
+
+    connect(m_menuButtonItem, &FluVNavigationMenuItem::menuItemClicked, [=]() { onMenuItemClicked(); });
+    connect(m_searchItem, &FluVNavigationSearchItem::itemClicked, [=]() { onMenuItemClicked(); });
+    connect(m_searchItem, &FluVNavigationSearchItem::currentTextChanged, [=](QString text) {
+        auto item = getItemByText(text);
+        if (item != nullptr)
+        {
+            if (item->getItemType() == FluVNavigationItemType::IconText)
+            {
+                auto iconTextItem = (FluVNavigationIconTextItem *)(item);
+                iconTextItem->onItemClickedDirect();
+                emit searchKeyChanged(iconTextItem->getKey());
+            }
+            else if (item->getItemType() == FluVNavigationItemType::Setting)
+            {
+                auto settingsItem = (FluVNavigationSettingsItem *)item;
+                settingsItem->onItemClicked();
+                emit searchKeyChanged(settingsItem->getKey());
+            }
+        }
+    });
+
+    connect(m_animation, &QPropertyAnimation::valueChanged, this, [=]() {
+        // LOG_DEBUG << "ValueObject value:" << m_valueObject->getValue();
+        setFixedWidth(m_valueObject->getValue());
+        update();
+    });
+
+    connect(m_animation, &QPropertyAnimation::finished, this, [=]() {
+        if (!m_bLong)
+            collapseView();
+        // else
+        //     expandView();
+    });
+
     onThemeChanged();
 }
 
 void FluVNavigationView::addItemToTopLayout(QWidget *item)
 {
-    m_vTopWrapLayout->addWidget(item, Qt::AlignTop);
+    m_vTopWrapLayout->addWidget(item, 0, Qt::AlignTop);
 }
 
 void FluVNavigationView::addItemToMidLayout(QWidget *item)
 {
-    m_midVScrollView->getMainLayout()->addWidget(item, Qt::AlignTop);
+    m_midVScrollView->getMainLayout()->addWidget(item, 0, Qt::AlignTop);
 
     auto iconTextItem = (FluVNavigationIconTextItem *)item;
     iconTextItem->setParentView(this);
@@ -106,6 +144,20 @@ void FluVNavigationView::updateAllItemsStyleSheet()
     }
 }
 
+void FluVNavigationView::setViewWidth(int width)
+{
+    m_nViewWidth = width;
+    int nItemWidth = m_nViewWidth - (m_vLayout->contentsMargins().left() + m_vLayout->contentsMargins().right());
+
+    // update all items width;
+    auto allitems = getAllItems();
+    for (auto item : allitems)
+    {
+        item->setItemWidth(nItemWidth);
+    }
+    setFixedWidth(m_nViewWidth);
+}
+
 std::vector<FluVNavigationItem *> FluVNavigationView::getAllItems()
 {
     std::vector<FluVNavigationItem *> items;
@@ -141,6 +193,17 @@ std::vector<FluVNavigationItem *> FluVNavigationView::getAllItems()
     return allItems;
 }
 
+std::vector<QString> FluVNavigationView::getAllItemsKeys()
+{
+    auto allItems = getAllItems();
+    std::vector<QString> keys;
+    for (auto item : allItems)
+    {
+        keys.push_back(item->getKey());
+    }
+    return keys;
+}
+
 FluVNavigationItem *FluVNavigationView::getItemByKey(QString key)
 {
     std::vector<FluVNavigationItem *> items = getAllItems();
@@ -157,15 +220,58 @@ FluVNavigationItem *FluVNavigationView::getItemByKey(QString key)
     return item;
 }
 
-void FluVNavigationView::paintEvent(QPaintEvent *event)
+std::vector<QString> FluVNavigationView::getAllItemsTexts()
 {
-    QStyleOption opt;
-    opt.initFrom(this);
-    QPainter painter(this);
-    style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+    std::vector<QString> texts;
+    auto allItems = getAllItems();
+    for (auto item : allItems)
+    {
+        if (item->getItemType() == FluVNavigationItemType::IconText)
+        {
+            auto iconTextItem = (FluVNavigationIconTextItem *)item;
+            texts.push_back(iconTextItem->getLabel()->text());
+        }
+        else if (item->getItemType() == FluVNavigationItemType::Setting)
+        {
+            auto settingsItem = (FluVNavigationSettingsItem *)item;
+            texts.push_back(settingsItem->getLabel()->text());
+        }
+    }
+
+    return texts;
 }
 
-void FluVNavigationView::onMenuItemClicked()
+FluVNavigationItem *FluVNavigationView::getItemByText(QString text)
+{
+    std::vector<FluVNavigationItem *> allItems = getAllItems();
+    FluVNavigationItem *item = nullptr;
+    for (auto item : allItems)
+    {
+        if (item->getItemType() == FluVNavigationItemType::IconText)
+        {
+            auto iconTextItem = (FluVNavigationIconTextItem *)item;
+            // texts.push_back(iconTextItem->getLabel()->text());
+            if (iconTextItem->getLabel()->text() == text)
+                return item;
+        }
+        else if (item->getItemType() == FluVNavigationItemType::Setting)
+        {
+            auto settingsItem = (FluVNavigationSettingsItem *)item;
+            if (settingsItem->getLabel()->text() == text)
+                return item;
+        }
+    }
+
+    return item;
+}
+
+void FluVNavigationView::updateSearchKeys()
+{
+    auto keys = getAllItemsTexts();
+    m_searchItem->updateSearchKeys(keys);
+}
+
+inline void FluVNavigationView::expandView()
 {
     // LOG_DEBUG << "called.";
     std::vector<QWidget *> itemVct;
@@ -184,118 +290,188 @@ void FluVNavigationView::onMenuItemClicked()
         itemVct.push_back(m_bottomWrapWidget->layout()->itemAt(i)->widget());
     }
 
-    if (m_bLong)
+    int nItemWidth = m_nViewWidth - (m_vLayout->contentsMargins().left() + m_vLayout->contentsMargins().right());
+    for (auto itemW : itemVct)
     {
-        // close all item in vLayout
-        for (auto itemW : itemVct)
+        auto item = (FluVNavigationItem *)(itemW);
+        if (item != nullptr)
         {
-            auto item = (FluVNavigationItem *)(itemW);
-            if (item != nullptr)
-            {
-                item->setLong(false);
-                // item->setFixedWidth(40);
-            }
+            item->setLong(true);
+            // item->setFixedWidth(40);
+        }
 
-            if (item->getItemType() == FluVNavigationItemType::IconText)
-            {
-                auto iconTextItem = (FluVNavigationIconTextItem *)(item);
-                if (!iconTextItem->isDown())
-                {
-                    iconTextItem->onItemClicked();
-                }
-                iconTextItem->setFixedWidth(40);
-                iconTextItem->getWrapWidget1()->setFixedWidth(40);
-                iconTextItem->hideLabelArrow();
-            }
+        if (item->getItemType() == FluVNavigationItemType::IconText)
+        {
+            auto iconTextItem = (FluVNavigationIconTextItem *)(item);
+            iconTextItem->setFixedWidth(nItemWidth);
+            iconTextItem->getWrapWidget1()->setFixedWidth(nItemWidth);
+            iconTextItem->showLabelArrow();
+        }
 
-            if (item->getItemType() == FluVNavigationItemType::Setting)
+        if (item->getItemType() == FluVNavigationItemType::Setting)
+        {
+            auto settingsItem = (FluVNavigationSettingsItem *)(item);
+            if (settingsItem != nullptr)
             {
-                auto settingsItem = (FluVNavigationSettingsItem *)(item);
-                if (settingsItem != nullptr)
-                {
-                    settingsItem->setFixedWidth(40);
-                    settingsItem->hideLabel();
-                }
-            }
-
-            if (item->getItemType() == FluVNavigationItemType::Search)
-            {
-                auto searchItem = (FluVNavigationSearchItem *)(item);
-                if (searchItem != nullptr)
-                {
-                    searchItem->setFixedWidth(40);
-                    searchItem->hideSearchEdit();
-                }
-            }
-
-            if (item->getItemType() == FluVNavigationItemType::Menu)
-            {
-                auto menuItem = (FluVNavigationMenuItem *)(item);
-                if (menuItem != nullptr)
-                {
-                    menuItem->setFixedWidth(40);
-                }
+                settingsItem->setFixedWidth(nItemWidth);
+                settingsItem->showLabel();
             }
         }
 
-        setFixedWidth(48);
+        if (item->getItemType() == FluVNavigationItemType::Search)
+        {
+            auto searchItem = (FluVNavigationSearchItem *)(item);
+            if (searchItem != nullptr)
+            {
+                searchItem->setFixedWidth(nItemWidth);
+                searchItem->hideSearchButton();
+            }
+        }
+    }
+}
+
+inline void FluVNavigationView::collapseView()
+{
+    // LOG_DEBUG << "called.";
+    std::vector<QWidget *> itemVct;
+    for (int i = 0; i < m_topWrapWidget->layout()->count(); i++)
+    {
+        itemVct.push_back(m_topWrapWidget->layout()->itemAt(i)->widget());
+    }
+
+    for (int i = 0; i < m_midVScrollView->getMainLayout()->count(); i++)
+    {
+        itemVct.push_back(m_midVScrollView->getMainLayout()->itemAt(i)->widget());
+    }
+
+    for (int i = 0; i < m_bottomWrapWidget->layout()->count(); i++)
+    {
+        itemVct.push_back(m_bottomWrapWidget->layout()->itemAt(i)->widget());
+    }
+
+    for (auto itemW : itemVct)
+    {
+        auto item = (FluVNavigationItem *)(itemW);
+        if (item != nullptr)
+        {
+            item->setLong(false);
+            // item->setFixedWidth(40);
+        }
+
+        if (item->getItemType() == FluVNavigationItemType::IconText)
+        {
+            auto iconTextItem = (FluVNavigationIconTextItem *)(item);
+            //  if (!iconTextItem->isDown())
+            // {
+            //     iconTextItem->onItemClicked();
+            // }
+            iconTextItem->setFixedWidth(40);
+            iconTextItem->getWrapWidget1()->setFixedWidth(40);
+            iconTextItem->hideLabelArrow();
+        }
+
+        if (item->getItemType() == FluVNavigationItemType::Setting)
+        {
+            auto settingsItem = (FluVNavigationSettingsItem *)(item);
+            if (settingsItem != nullptr)
+            {
+                settingsItem->setFixedWidth(40);
+                settingsItem->hideLabel();
+            }
+        }
+
+        if (item->getItemType() == FluVNavigationItemType::Search)
+        {
+            auto searchItem = (FluVNavigationSearchItem *)(item);
+            if (searchItem != nullptr)
+            {
+                searchItem->setFixedWidth(40);
+                searchItem->hideSearchEdit();
+            }
+        }
+
+        if (item->getItemType() == FluVNavigationItemType::Menu)
+        {
+            auto menuItem = (FluVNavigationMenuItem *)(item);
+            if (menuItem != nullptr)
+            {
+                menuItem->setFixedWidth(40);
+            }
+        }
+    }
+}
+
+void FluVNavigationView::collapseDownView()
+{
+    std::vector<QWidget *> itemVct;
+    for (int i = 0; i < m_topWrapWidget->layout()->count(); i++)
+    {
+        itemVct.push_back(m_topWrapWidget->layout()->itemAt(i)->widget());
+    }
+
+    for (int i = 0; i < m_midVScrollView->getMainLayout()->count(); i++)
+    {
+        itemVct.push_back(m_midVScrollView->getMainLayout()->itemAt(i)->widget());
+    }
+
+    for (int i = 0; i < m_bottomWrapWidget->layout()->count(); i++)
+    {
+        itemVct.push_back(m_bottomWrapWidget->layout()->itemAt(i)->widget());
+    }
+
+    for (auto itemW : itemVct)
+    {
+        auto item = (FluVNavigationItem *)(itemW);
+        if (item->getItemType() == FluVNavigationItemType::IconText)
+        {
+            auto iconTextItem = (FluVNavigationIconTextItem *)(item);
+            if (!iconTextItem->isDown())
+            {
+                iconTextItem->onItemClicked();
+            }
+        }
+    }
+}
+
+void FluVNavigationView::resizeEvent(QResizeEvent *event)
+{
+    // LOG_DEBUG << event->size();
+}
+
+void FluVNavigationView::paintEvent(QPaintEvent *event)
+{
+    QStyleOption opt;
+    opt.initFrom(this);
+    QPainter painter(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
+}
+
+void FluVNavigationView::onMenuItemClicked()
+{
+    // LOG_DEBUG << "called.";
+    if (m_bLong)
+    {
+        collapseDownView();
+
+        // LOG_DEBUG << width();
+        m_valueObject->setValue(width());
+        m_animation->setStartValue(width());
+        m_animation->setEndValue(40 + m_vLayout->contentsMargins().left() + m_vLayout->contentsMargins().right());
+        m_animation->start();
         m_bLong = false;
-        // m_midVScrollView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
     else
     {
-        for (auto itemW : itemVct)
-        {
-            auto item = (FluVNavigationItem *)(itemW);
-            if (item != nullptr)
-            {
-                item->setLong(true);
-                // item->setFixedWidth(40);
-            }
+        expandView();
 
-            if (item->getItemType() == FluVNavigationItemType::IconText)
-            {
-                auto iconTextItem = (FluVNavigationIconTextItem *)(item);
-                iconTextItem->setFixedWidth(220);
-                iconTextItem->getWrapWidget1()->setFixedWidth(220);
-                iconTextItem->showLabelArrow();
-            }
-
-            if (item->getItemType() == FluVNavigationItemType::Setting)
-            {
-                auto settingsItem = (FluVNavigationSettingsItem *)(item);
-                if (settingsItem != nullptr)
-                {
-                    settingsItem->setFixedWidth(220);
-                    settingsItem->showLabel();
-                }
-            }
-
-            if (item->getItemType() == FluVNavigationItemType::Search)
-            {
-                auto searchItem = (FluVNavigationSearchItem *)(item);
-                if (searchItem != nullptr)
-                {
-                    searchItem->setFixedWidth(220);
-                    searchItem->hideSearchButton();
-                }
-            }
-        }
-
-        setFixedWidth(220 + 10);
+        m_animation->setStartValue(width());
+        m_animation->setEndValue(m_nViewWidth);
+        m_animation->start();
         m_bLong = true;
     }
 }
 
 void FluVNavigationView::onThemeChanged()
 {
-    // LOG_DEBUG << "called";
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVNavigationView.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluVNavigationView.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluVNavigationView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

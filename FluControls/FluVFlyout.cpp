@@ -21,14 +21,8 @@ FluVFlyout::FluVFlyout(QWidget* target, FluFlyoutPosition position /*= FluFlyout
 
     setShadowEffect();
 
-
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
-    // FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVFlyout.qss", this);
-    // if (FluThemeUtils::isDarkTheme())
-    // {
-    //     FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluVFlyout.qss", this);
-    // }
 
     onThemeChanged();
 }
@@ -41,7 +35,7 @@ void FluVFlyout::setShadowEffect()
     m_shadowEffect->setOffset(0, 0);
     m_shadowEffect->setColor(QColor(0, 0, 0, 30));
     if (FluThemeUtils::isDarkTheme())
-        m_shadowEffect->setColor(QColor(0,0,0,80));
+        m_shadowEffect->setColor(QColor(0, 0, 0, 80));
     m_shadowWidget->setGraphicsEffect(m_shadowEffect);
 }
 
@@ -101,12 +95,5 @@ void FluVFlyout::paintEvent(QPaintEvent* event)
 
 void FluVFlyout::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVFlyout.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluVFlyout.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluVFlyout.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

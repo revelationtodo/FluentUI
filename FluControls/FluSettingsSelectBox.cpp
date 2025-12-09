@@ -27,13 +27,13 @@ FluSettingsSelectBox::FluSettingsSelectBox(QWidget* parent /*= nullptr*/) : FluW
     setFixedHeight(70);
 
     m_iconAwesomeType = FluAwesomeType::None;
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSettingsSelectBox.qss", this);
+    onThemeChanged();
 }
 
 FluSettingsSelectBox::FluSettingsSelectBox(FluAwesomeType awesomeType, QWidget* parent /*= nullptr*/) : FluSettingsSelectBox(parent)
 {
     m_iconAwesomeType = awesomeType;
-    setIcon(FluIconUtils::getFluentIcon(m_iconAwesomeType));
+    setIcon(FluIconUtils::getFluentIcon(m_iconAwesomeType, FluThemeUtils::getUtils()->getTheme()));
 }
 
 FluComboBoxEx* FluSettingsSelectBox::getComboBox()
@@ -49,7 +49,7 @@ void FluSettingsSelectBox::setIcon(QIcon icon)
 void FluSettingsSelectBox::setIcon(FluAwesomeType awesomeType)
 {
     m_iconAwesomeType = awesomeType;
-    setIcon(FluIconUtils::getFluentIcon(m_iconAwesomeType));
+    setIcon(FluIconUtils::getFluentIcon(m_iconAwesomeType, FluThemeUtils::getUtils()->getTheme()));
 }
 
 void FluSettingsSelectBox::setTitleInfo(QString title, QString info)
@@ -73,15 +73,6 @@ void FluSettingsSelectBox::paintEvent(QPaintEvent* event)
 
 void FluSettingsSelectBox::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        // m_iconLabel->setPixmap(FluIconUtils::getFluentIconPixmap())
-        setIcon(FluIconUtils::getFluentIcon(m_iconAwesomeType, QColor(8, 8, 8)));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSettingsSelectBox.qss", this);
-    }
-    else
-    {
-        setIcon(FluIconUtils::getFluentIcon(m_iconAwesomeType, QColor(239, 239, 239)));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluSettingsSelectBox.qss", this);
-    }
+    setIcon(FluIconUtils::getFluentIcon(m_iconAwesomeType, FluThemeUtils::getUtils()->getTheme()));
+    FluStyleSheetUitls::setQssByFileName("FluSettingsSelectBox.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

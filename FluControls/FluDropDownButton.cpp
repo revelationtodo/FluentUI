@@ -42,7 +42,7 @@ FluDropDownButton::FluDropDownButton(QWidget* parent /*= nullptr*/) : FluWidget(
         //  m_menu->show();
     });
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluDropDownButton.qss", this);
+    onThemeChanged();
 }
 
 QPushButton* FluDropDownButton::getTextBtn()
@@ -72,6 +72,10 @@ void FluDropDownButton::setSvgPath(QString svgLightPath, QString svgDarkPath)
 {
     m_svgLightPath = svgLightPath;
     m_svgDarkPath = svgDarkPath;
+#ifdef USE_QRC
+    m_svgDarkPath = m_svgDarkPath.replace("../res/", ":/res/");
+    m_svgLightPath = m_svgLightPath.replace("../res/", ":/res/");
+#endif
 }
 
 void FluDropDownButton::setText(QString text)
@@ -86,7 +90,7 @@ void FluDropDownButton::addTextItem(QString text)
 
 void FluDropDownButton::addIconTextItem(FluAwesomeType type, QString text)
 {
-    m_menu->addAction(new FluAction(FluIconUtils::getFluentIconPixmap(type, FluThemeUtils::getUtils()->getTheme()), text));
+    m_menu->addAction(new FluAction(type, text));
 }
 
 void FluDropDownButton::addIconTextItem(QIcon type, QString text)
@@ -96,11 +100,6 @@ void FluDropDownButton::addIconTextItem(QIcon type, QString text)
 
 void FluDropDownButton::mouseReleaseEvent(QMouseEvent* e)
 {
-    //  QPoint leftBottomPos = rect().bottomLeft();
-    //  leftBottomPos = mapToGlobal(leftBottomPos);
-    //  leftBottomPos.setY(leftBottomPos.y() + 3);
-    //  m_menu->exec(leftBottomPos);
-    //  m_menu->show();
     emit clicked();
 }
 
@@ -121,7 +120,7 @@ void FluDropDownButton::onThemeChanged()
             m_textBtn->setIcon(FluIconUtils::getFluentIcon(m_textAwesomeType, FluTheme::Light));
         if (m_svgLightPath != "")
             m_textBtn->setIcon(FluIconUtils::getSvgIcon(m_svgLightPath));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluDropDownButton.qss", this);
+        //  FluStyleSheetUitls::setQssByFileName("../StyleSheet/light/FluDropDownButton.qss", this);
     }
     else
     {
@@ -131,6 +130,7 @@ void FluDropDownButton::onThemeChanged()
         if (m_svgDarkPath != "")
             m_textBtn->setIcon(FluIconUtils::getSvgIcon(m_svgDarkPath));
 
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluDropDownButton.qss", this);
+        //  FluStyleSheetUitls::setQssByFileName("../StyleSheet/dark/FluDropDownButton.qss", this);
     }
+    FluStyleSheetUitls::setQssByFileName("FluDropDownButton.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

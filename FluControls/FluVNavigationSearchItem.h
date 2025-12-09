@@ -1,11 +1,12 @@
 #pragma once
 
 #include "FluVNavigationItem.h"
-#include "FluSearchLineEdit.h"
+#include "FluAutoSuggestBox.h"
 #include <QHBoxLayout>
 #include <QPaintEvent>
 #include <QStyleOption>
 #include <QStyle>
+#include <vector>
 
 class FluVNavigationSearchItem : public FluVNavigationItem
 {
@@ -17,6 +18,8 @@ class FluVNavigationSearchItem : public FluVNavigationItem
 
     void hideSearchEdit();
 
+    void updateSearchKeys(std::vector<QString> keys);
+
     void mouseReleaseEvent(QMouseEvent* event);
 
     // to enable qss
@@ -24,13 +27,13 @@ class FluVNavigationSearchItem : public FluVNavigationItem
 
   signals:
     void itemClicked();
+    void currentTextChanged(QString text);
   public slots:
     void onItemClicked();
-
     void onThemeChanged();
 
   protected:
     QHBoxLayout* m_hMainLayout;
-    FluSearchLineEdit* m_searchLineEdit;
+    FluAutoSuggestBox* m_autoSuggestBox;
     QPushButton* m_searchButton;
 };

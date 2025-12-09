@@ -52,12 +52,5 @@ void FluLabel::setLabelStyle(FluLabelStyle style)
 
 void FluLabel::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluLabel.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluLabel.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluLabel.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

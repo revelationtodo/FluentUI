@@ -21,12 +21,5 @@ void FluLineEdit::paintEvent(QPaintEvent* event)
 
 void FluLineEdit::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluLineEdit.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluLineEdit.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluLineEdit.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

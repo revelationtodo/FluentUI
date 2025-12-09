@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 
 #include <QStackedLayout>
 #include <QMap>
 #include "FluWidget.h"
+#include <QPropertyAnimation>
 
 // use it only contains widgets
 // when use it, please just use addWidget , removeWidget
@@ -23,6 +24,9 @@ class FluStackedLayout : public QStackedLayout
 
     void setCurrentWidget(QString str);
 
+    QWidget *getWidget(QString str);
+
   protected:
     QMap<QString, QWidget *> m_widgetMap;
+    // QPropertyAnimation *m_animation;
 };

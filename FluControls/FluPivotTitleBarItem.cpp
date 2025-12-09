@@ -19,7 +19,7 @@ FluPivotTitleBarItem::FluPivotTitleBarItem(QWidget* parent /*= nullptr*/) : QPus
     m_indicatorLabel->setFixedHeight(4);
     setSelected(false);
     setFixedHeight(45);
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluPivotTitleBarItem.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=]() { onThemeChanged(); });
     adjustItemSize();
 }
@@ -57,12 +57,5 @@ void FluPivotTitleBarItem::adjustItemSize()
 
 void FluPivotTitleBarItem::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluPivotTitleBarItem.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluPivotTitleBarItem.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluPivotTitleBarItem.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

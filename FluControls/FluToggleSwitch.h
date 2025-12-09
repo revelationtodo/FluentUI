@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "FluWidget.h"
 #include <QCheckBox>
@@ -11,13 +11,32 @@ class FluToggleSwitch : public QCheckBox
     FluToggleSwitch(QWidget* parent = nullptr)
         : QCheckBox(parent)
     {
-        m_onText  = "On";
-        m_offText = "Off";
+        m_onText = tr("On");
+        m_offText = tr("Off");
 
         m_bEmptyText = false;
 
         setText(m_offText);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluToggleSwitch.qss", this);
+        connect(this, &FluToggleSwitch::clicked, [=](bool bChecked) {
+            if (m_bEmptyText)
+                return;
+
+            if (bChecked)
+                setText(m_onText);
+            else
+                setText(m_offText);
+        });
+
+        onThemeChanged();
+        connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
+    }
+
+    FluToggleSwitch(QString text, QWidget* parent = nullptr) : QCheckBox(text, parent)
+    {
+        m_onText = "On";
+        m_offText = "Off";
+
+        setText(m_offText);
         connect(this, &FluToggleSwitch::clicked, [=](bool bChecked) {
             if (m_bEmptyText)
                 return;
@@ -34,6 +53,7 @@ class FluToggleSwitch : public QCheckBox
             }
         });
 
+        onThemeChanged();
         connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
     }
 
@@ -51,14 +71,7 @@ class FluToggleSwitch : public QCheckBox
   public slots:
     void onThemeChanged()
     {
-        if (FluThemeUtils::isLightTheme())
-        {
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluToggleSwitch.qss", this);
-        }
-        else
-        {
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluToggleSwitch.qss", this);
-        }
+        FluStyleSheetUitls::setQssByFileName("FluToggleSwitch.qss", this, FluThemeUtils::getUtils()->getTheme());
     }
 
   protected:

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../FluUtils/FluIconUtils.h"
 #include "../FluUtils/FluLogUtils.h"
@@ -16,9 +16,13 @@
 #include <QVBoxLayout>
 #include "FluWidget.h"
 #include "FluVScrollView.h"
+#include <QPropertyAnimation>
+#include "FluValueObject.h"
 
 class FluVNavigationItem;
 class FluVNavigationIconTextItem;
+class FluVNavigationMenuItem;
+class FluVNavigationSearchItem;
 class FluVNavigationView : public FluWidget
 {
     Q_OBJECT
@@ -44,17 +48,38 @@ class FluVNavigationView : public FluWidget
         return m_bLong;
     }
 
-    std::vector<FluVNavigationItem *> getAllItems();
+    void setViewWidth(int width);
 
+    int getViewWidth()
+    {
+        return m_nViewWidth;
+    }
+
+    std::vector<FluVNavigationItem *> getAllItems();
+    std::vector<QString> getAllItemsKeys();
     FluVNavigationItem *getItemByKey(QString key);
 
-    void paintEvent(QPaintEvent *event) override;
+    std::vector<QString> getAllItemsTexts();
+    FluVNavigationItem *getItemByText(QString text);
+    void updateSearchKeys();
 
+    void expandView();
+
+    void collapseView();
+
+    void collapseDownView();
+
+    void resizeEvent(QResizeEvent *event);
+
+    void paintEvent(QPaintEvent *event) override;
+  signals:
+    void searchKeyChanged(QString key);
+    void keyChanged(QString key);
   public slots:
     void onMenuItemClicked();
     void onThemeChanged();
 
-  public:
+  protected:
     QVBoxLayout *m_vLayout;
 
     QWidget *m_topWrapWidget;
@@ -64,5 +89,14 @@ class FluVNavigationView : public FluWidget
     QVBoxLayout *m_vTopWrapLayout;
     QVBoxLayout *m_vBottomLayout;
 
+    FluVNavigationMenuItem *m_menuButtonItem;
+    FluVNavigationSearchItem *m_searchItem;
     bool m_bLong;
+
+    // view width
+    int m_nViewWidth;
+
+    // animation;
+    QPropertyAnimation *m_animation;
+    FluValueObject *m_valueObject;
 };

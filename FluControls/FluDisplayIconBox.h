@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "FluWidget.h"
 #include <QLabel>
@@ -18,9 +18,17 @@ class FluDisplayIconBox : public FluWidget
 
     FluDisplayIconBox(FluAwesomeType type, QWidget* parent = nullptr);
 
+    FluDisplayIconBox(FluEmoijType type, QWidget* parent = nullptr);
+
     void setSelected(bool bSelected);
 
     FluAwesomeType getAwesomeType();
+    FluEmoijType getEmoijType();
+
+    void setUseAwesomeType(bool bUseAwesomeType)
+    {
+        m_bUseAwesomeType = bUseAwesomeType;
+    }
 
     void mouseReleaseEvent(QMouseEvent* event);
 
@@ -31,7 +39,11 @@ class FluDisplayIconBox : public FluWidget
     void onThemeChanged();
 
   protected:
-    FluAwesomeType m_type;
+    // true: display awesometype;
+    bool m_bUseAwesomeType;
+
+    FluAwesomeType m_awesomeType;
+    FluEmoijType m_emoijType;
     QLabel* m_iconLabel;
     QLabel* m_textLable;
     QVBoxLayout* m_vMainLayout;

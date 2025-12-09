@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QFont>
 #include <QIcon>
@@ -22,7 +22,9 @@ class FluIconUtils
     static QIcon getFluentIcon(FluAwesomeType nType);
 
     static QPixmap getFluentIconPixmap(FluAwesomeType nType, FluTheme theme);
+    static QPixmap getFluentIconPixmap(FluAwesomeType nType, FluTheme theme, int w, int h);
     static QIcon getFluentIcon(FluAwesomeType nType, FluTheme theme);
+    static QIcon getFluentIcon(FluAwesomeType nType, FluTheme theme, int w, int h);
 
     static QPixmap getFluentIconPixmap(FluAwesomeType nType, QColor penColor, int w, int h);
     static QPixmap getFluentIconPixmap(FluAwesomeType nType, QColor penColor);
@@ -32,6 +34,16 @@ class FluIconUtils
 
     static QPixmap getSvgPixmap(QString svgPath);
     static QIcon getSvgIcon(QString svgPath);
+
+    static QPixmap getPixmap(QString path)
+    {
+#ifndef USE_QRC
+        return QPixmap(path);
+#else
+        path = path.replace("../res/", ":/res/");
+        return QPixmap(path);
+#endif
+    }
 
   private:
     QFont m_fluentFont;

@@ -1,4 +1,4 @@
-#include "FluVCard.h"
+﻿#include "FluVCard.h"
 
 FluVCard::FluVCard(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
@@ -8,7 +8,7 @@ FluVCard::FluVCard(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 
     m_iconLabel = new QLabel(this);
     m_iconLabel->setFixedSize(60, 60);
-    QPixmap galleryPng = QPixmap("../res/HomeHeaderTiles/Header-WinUIGallery.png");
+    QPixmap galleryPng = FluIconUtils::getPixmap(("../res/HomeHeaderTiles/Header-WinUIGallery.png"));
     galleryPng = galleryPng.scaled(60, 60);
     m_iconLabel->setPixmap(galleryPng);
 
@@ -28,8 +28,9 @@ FluVCard::FluVCard(QWidget* parent /*= nullptr*/) : FluWidget(parent)
     vMainLaout->addWidget(m_contextLabel);
 
     setFixedSize(200, 220);
-    QString qss = FluStyleSheetUitls::getQssByFileName("/resources/qss/light/FluVCard.qss");
-    setStyleSheet(qss);
+    // QString qss = FluStyleSheetUitls::getQssByFileName("../StyleSheet/light/FluVCard.qss");
+    // setStyleSheet(qss);
+    onThemeChanged();
 }
 
 FluVCard::FluVCard(QPixmap icon, QString titleText, QString contextText, QWidget* parent /*= nullptr*/) : FluVCard(parent)
@@ -38,6 +39,7 @@ FluVCard::FluVCard(QPixmap icon, QString titleText, QString contextText, QWidget
     m_iconLabel->setPixmap(pixmap);
     m_titleLabel->setText(titleText);
     m_contextLabel->setText(contextText);
+    onThemeChanged();
 }
 
 void FluVCard::setIcon(QPixmap icon)
@@ -56,12 +58,5 @@ void FluVCard::paintEvent(QPaintEvent* event)
 
 void FluVCard::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVCard.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluVCard.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluVCard.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

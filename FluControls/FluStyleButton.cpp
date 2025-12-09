@@ -1,7 +1,8 @@
-#include "FluStyleButton.h"
+﻿#include "FluStyleButton.h"
 
 FluStyleButton::FluStyleButton(QWidget* parent /*= nullptr*/) : QPushButton(parent)
 {
+    setPill(false);
     setFixedSize(200, 30);
     onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
@@ -9,12 +10,5 @@ FluStyleButton::FluStyleButton(QWidget* parent /*= nullptr*/) : QPushButton(pare
 
 void FluStyleButton::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluStyleButton.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluStyleButton.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluStyleButton.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

@@ -14,7 +14,7 @@ FluTextEdit::FluTextEdit(QWidget* parent /*= nullptr*/)
 
         setFixedHeight(this->document()->size().height() + 6);
     });
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTextEdit.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
@@ -41,12 +41,5 @@ void FluTextEdit::paintEvent(QPaintEvent* event)
 
 void FluTextEdit::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTextEdit.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluTextEdit.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluTextEdit.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

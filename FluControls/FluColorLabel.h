@@ -9,6 +9,6 @@ class FluColorLabel : public QLabel
   public:
     FluColorLabel(QWidget* parent = nullptr) : QLabel(parent)
     {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluColorLabel.qss", this);
+        FluStyleSheetUitls::setQssByFileName("FluColorLabel.qss", this, FluThemeUtils::getUtils()->getTheme());
     }
 };

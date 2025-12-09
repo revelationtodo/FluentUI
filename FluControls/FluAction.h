@@ -3,6 +3,7 @@
 #include <QAction>
 #include "FluDef.h"
 #include "../FluUtils/FluUtils.h"
+#include <QListWidgetItem>
 
 class FluAction : public QAction
 {
@@ -20,6 +21,13 @@ class FluAction : public QAction
 
     void setAwesomeType(FluAwesomeType type);
 
+    void setListWidgetItem(QListWidgetItem* item);
+
+    QListWidgetItem* getListWidgetItem();
+  public slots:
+    void onThemeChanged();
+
   protected:
+    QListWidgetItem* m_listWidgetItem;
     FluAwesomeType m_awesomeType;
 };

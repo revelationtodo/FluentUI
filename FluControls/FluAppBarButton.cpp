@@ -1,4 +1,4 @@
-#include "FluAppBarButton.h"
+﻿#include "FluAppBarButton.h"
 
 FluAppBarButton::FluAppBarButton(FluAwesomeType awesomeType, QWidget* parent /*= nullptr*/) : FluWidget(parent), m_awesomeType(awesomeType), m_shortCut(nullptr)
 {
@@ -23,7 +23,7 @@ FluAppBarButton::FluAppBarButton(FluAwesomeType awesomeType, QWidget* parent /*=
     m_vMainLayout->addWidget(m_textLabel);
 
     m_iconBtn->setIcon(FluIconUtils::getFluentIconPixmap(awesomeType, FluThemeUtils::getUtils()->getTheme()));
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluAppBarButton.qss", this);
+    onThemeChanged();
 }
 
 void FluAppBarButton::setAwesomeType(FluAwesomeType awesomeType)
@@ -76,14 +76,6 @@ void FluAppBarButton::paintEvent(QPaintEvent* event)
 
 void FluAppBarButton::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluTheme::Light));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluAppBarButton.qss", this);
-    }
-    else
-    {
-        m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluTheme::Dark));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluAppBarButton.qss", this);
-    }
+    m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluThemeUtils::getUtils()->getTheme()));
+    FluStyleSheetUitls::setQssByFileName("FluAppBarButton.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

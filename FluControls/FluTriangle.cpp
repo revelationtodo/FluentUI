@@ -63,13 +63,7 @@ QList<QPoint> FluTriangle::getPointsByOrient(FluTriangleOrient orient)
 
 void FluTriangle::paintEvent(QPaintEvent* event)
 {
-    // QStyleOption opt;
-    // opt.initFrom(this);
-    // QPainter painter(this);
-    // style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
-
     QPainter painter(this);
-
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 
     QPen pen;
@@ -82,7 +76,7 @@ void FluTriangle::paintEvent(QPaintEvent* event)
     brush.setColor(QColor(249, 249, 249));
     brush.setStyle(Qt::SolidPattern);
     painter.setBrush(brush);
-#if (QT_VERSION >= QT_VERSION_CHECK(6,0,0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     painter.drawPolygon(getPointsByOrient(FluTriangleOrient::Top));
 #endif
 }

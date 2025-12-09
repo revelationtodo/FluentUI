@@ -11,7 +11,7 @@ FluDisplayBoxEx::FluDisplayBoxEx(QWidget* parent /*= nullptr*/)
     m_titleLabel->setFixedHeight(30);
     m_titleLabel->setWordWrap(true);
     m_titleLabel->setObjectName("titleLabel");
-    m_titleLabel->setText("A Title");
+    m_titleLabel->setText(tr("A Title"));
 
     m_vMainLayout->addWidget(m_titleLabel);
 
@@ -40,7 +40,8 @@ FluDisplayBoxEx::FluDisplayBoxEx(QWidget* parent /*= nullptr*/)
     m_codeExpander = new FluCodeExpander;
     m_vMainLayout->addWidget(m_codeExpander);
     m_codeExpander->setObjectName("codeExpander");
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluDisplayBoxEx.qss", this);
+
+    onThemeChanged();
 }
 
 void FluDisplayBoxEx::setTitle(QString title)
@@ -83,12 +84,5 @@ void FluDisplayBoxEx::paintEvent(QPaintEvent* event)
 
 void FluDisplayBoxEx::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluDisplayBoxEx.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluDisplayBoxEx.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluDisplayBoxEx.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

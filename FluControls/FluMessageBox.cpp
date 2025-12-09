@@ -1,4 +1,5 @@
 #include "FluMessageBox.h"
+#include <QThread>
 
 FluMessageBox::FluMessageBox(QString title, QString info, QWidget* parent) : QDialog(parent)
 {
@@ -30,8 +31,8 @@ FluMessageBox::FluMessageBox(QString title, QString info, QWidget* parent) : QDi
     m_okBtn = new FluStyleButton;
     m_cancelBtn = new FluPushButton;
 
-    m_okBtn->setText("OK");
-    m_cancelBtn->setText("Cancel");
+    m_okBtn->setText(tr("OK"));
+    m_cancelBtn->setText(tr("Cancel"));
 
     m_titleLabel->setText(title);
     m_infoLabel->setText(info);
@@ -85,13 +86,28 @@ FluMessageBox::FluMessageBox(QString title, QString info, QWidget* parent) : QDi
 
     connect(m_cancelBtn, &QPushButton::clicked, [=]() { reject(); });
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluMessageBox.qss", this);
-    if (FluThemeUtils::isDarkTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluMessageBox.qss", this);
-    }
-
+    onThemeChanged();
     m_parentWidget->installEventFilter(this);
+}
+
+QString FluMessageBox::getTitle()
+{
+    return m_titleLabel->text();
+}
+
+void FluMessageBox::setTitle(QString title)
+{
+    m_titleLabel->setText(title);
+}
+
+QString FluMessageBox::getInfo()
+{
+    return m_infoLabel->text();
+}
+
+void FluMessageBox::setInfo(QString info)
+{
+    m_infoLabel->setText(info);
 }
 
 void FluMessageBox::showEvent(QShowEvent* event)
@@ -121,17 +137,15 @@ bool FluMessageBox::eventFilter(QObject* obj, QEvent* event)
         return true;
     }
 
+    if (event->type() == QEvent::KeyPress)
+    {
+        QThread::msleep(0);
+    }
+
     return QDialog::eventFilter(obj, event);
 }
 
 void FluMessageBox::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluMessageBox.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluMessageBox.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluMessageBox.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

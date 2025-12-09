@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "FluWidget.h"
 #include "FluLoopView.h"
@@ -10,12 +10,37 @@
 #include <QStyleOption>
 #include "FluHSplitLine.h"
 #include "FluVSplitLine.h"
+#include "FluDatePickerViewMask.h"
+#include <QFrame>
+#include <QGraphicsDropShadowEffect>
 
 class FluDatePickerView : public FluWidget
 {
     Q_OBJECT
+    Q_PROPERTY(QColor maskBackgroundColorEx READ getMaskBackgroundColorEx WRITE setMaskBackgroundColorEx)
+    Q_PROPERTY(QColor maskTextColorEx READ getMaskTextColorEx WRITE setMaskTextColorEx)
   public:
     FluDatePickerView(QWidget* parent = nullptr);
+
+    void setMaskBackgroundColorEx(QColor color)
+    {
+        m_mask->setBackgroundColorEx(color);
+    }
+
+    QColor getMaskBackgroundColorEx()
+    {
+        return m_mask->getBackgroundColorEx();
+    }
+
+    void setMaskTextColorEx(QColor color)
+    {
+        m_mask->setTextColorEx(color);
+    }
+
+    QColor getMaskTextColorEx()
+    {
+        return m_mask->getTextColorEx();
+    }
 
     int getMonth();
 
@@ -33,9 +58,13 @@ class FluDatePickerView : public FluWidget
 
     int getMonthDays(int year, int month);
 
+    void setShadowEffect();
+
     void paintEvent(QPaintEvent* event);
 
     void showEvent(QShowEvent* event);
+
+    void resizeEvent(QResizeEvent* event);
   signals:
     void clickedOk();
     void clickedCancel();
@@ -43,10 +72,15 @@ class FluDatePickerView : public FluWidget
     void onThemeChanged();
 
   protected:
+    QFrame* m_mainView;
+    QHBoxLayout* m_hMainViewLayout;
+    QGraphicsDropShadowEffect* m_shadowEffect;
+
     QVBoxLayout* m_vMainLayout;
     QHBoxLayout* m_hViewLayout;
     QHBoxLayout* m_hBtnLayout;
 
+    FluDatePickerViewMask* m_mask;
     FluLoopView* m_monthView;
     FluLoopView* m_dayView;
     FluLoopView* m_yearView;

@@ -652,12 +652,12 @@ void FluHNavigationIconTextItem::onItemClicked()
         if (!getItems().empty())
         {
 #ifdef _DEBUG
-            static int nClickedCount = 0;
-            nClickedCount++;
-            if (nClickedCount == 2)
-            {
-                QThread::sleep(0);
-            }
+            // static int nClickedCount = 0;
+            // nClickedCount++;
+            // if (nClickedCount == 2)
+            // {
+            // QThread::sleep(0);
+            // }
 #endif
             if (m_bDown)
             {
@@ -752,13 +752,14 @@ void FluHNavigationIconTextItem::onThemeChanged()
     if (FluThemeUtils::isLightTheme())
     {
         m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluTheme::Light));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHNavigationIconTextItem.qss", this);
+        // FluStyleSheetUitls::setQssByFileName("../StyleSheet/light/FluHNavigationIconTextItem.qss", this);
         setArrowBtnToChevronDown();
     }
     else
     {
         m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluTheme::Dark));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluHNavigationIconTextItem.qss", this);
+        // FluStyleSheetUitls::setQssByFileName("../StyleSheet/dark/FluHNavigationIconTextItem.qss", this);
         setArrowBtnToChevronUp();
     }
+    FluStyleSheetUitls::setQssByFileName("FluHNavigationIconTextItem.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

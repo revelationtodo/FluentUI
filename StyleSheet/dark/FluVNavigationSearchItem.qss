@@ -1,0 +1,15 @@
+FluVNavigationSearchItem {
+    background-color: rgb(32, 32, 32);
+    border-radius: 4px;
+    border: 1px solid transparent;
+}
+
+FluVNavigationSearchItem[isLong=false]:hover {
+    background-color: rgb(45, 45, 45);
+    border-radius: 4px;
+}
+
+#searchButton {
+    background-color: transparent;
+    border: 1px solid transparent;
+}

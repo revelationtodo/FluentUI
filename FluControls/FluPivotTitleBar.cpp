@@ -8,7 +8,7 @@ FluPivotTitleBar::FluPivotTitleBar(QWidget* parent /*= nullptr*/) : FluWidget(pa
     m_hMainLayout->setContentsMargins(0, 0, 0, 0);
     m_hMainLayout->setAlignment(Qt::AlignLeft);
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluPivotTitleBar.qss", this);
+    onThemeChanged();
 }
 
 void FluPivotTitleBar::addTitleBarItem(FluPivotTitleBarItem* item)
@@ -41,12 +41,5 @@ void FluPivotTitleBar::setCurTitleBarItem(FluPivotTitleBarItem* titleBarItem)
 
 void FluPivotTitleBar::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluPivotTitleBar.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluPivotTitleBar.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluPivotTitleBar.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

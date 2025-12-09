@@ -1,4 +1,4 @@
-#include "FluIconUtils.h"
+﻿#include "FluIconUtils.h"
 #include "../FluControls/FluDef.h"
 #include <QFontDatabase>
 #include <QPainter>
@@ -11,8 +11,6 @@ FluIconUtils::FluIconUtils()
     int         fontId       = QFontDatabase::addApplicationFont(QDir::currentPath() + "/resources/fonts/Segoe_Fluent_Icons.ttf");
     QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
     m_fluentFont.setFamily(fontFamilies.at(0));
-
-   // QApplication::setFont(m_fluentFont);
 }
 
 FluIconUtils::~FluIconUtils()
@@ -27,7 +25,6 @@ FluIconUtils* FluIconUtils::getInstance()
 
 QPixmap FluIconUtils::getFluentIconPixmap(FluAwesomeType nType)
 {
-    //  return getFluentIconPixmap(nType, QColor(255, 255, 255));
     return getFluentIconPixmap(nType, QColor(8, 8, 8));
 }
 
@@ -72,12 +69,34 @@ QPixmap FluIconUtils::getFluentIconPixmap(FluAwesomeType nType, FluTheme theme)
     if (theme == FluTheme::Dark)
         return FluIconUtils::getFluentIconPixmap(nType, QColor(239, 239, 239));
 
+    if (theme == FluTheme::AtomOneDark)
+        return FluIconUtils::getFluentIconPixmap(nType, QColor(Qt::white));
+
     return FluIconUtils::getFluentIconPixmap(nType, QColor(8, 8, 8));
+}
+
+QPixmap FluIconUtils::getFluentIconPixmap(FluAwesomeType nType, FluTheme theme, int w, int h)
+{
+    if (theme == FluTheme::Light)
+        return FluIconUtils::getFluentIconPixmap(nType, QColor(8, 8, 8), w, h);
+
+    if (theme == FluTheme::Dark)
+        return FluIconUtils::getFluentIconPixmap(nType, QColor(239, 239, 239), w, h);
+
+    if (theme == FluTheme::AtomOneDark)
+        return FluIconUtils::getFluentIconPixmap(nType, QColor(Qt::white), w, h);
+
+    return FluIconUtils::getFluentIconPixmap(nType, QColor(8, 8, 8), w, h);
 }
 
 QIcon FluIconUtils::getFluentIcon(FluAwesomeType nType, FluTheme theme)
 {
     return QIcon(getFluentIconPixmap(nType, theme));
+}
+
+QIcon FluIconUtils::getFluentIcon(FluAwesomeType nType, FluTheme theme, int w, int h)
+{
+    return QIcon(getFluentIconPixmap(nType, theme, w, h));
 }
 
 QIcon FluIconUtils::getFluentIcon(FluAwesomeType nType, QColor penColor)

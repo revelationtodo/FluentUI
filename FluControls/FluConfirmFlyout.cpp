@@ -24,8 +24,8 @@ FluConfirmFlyout::FluConfirmFlyout(QWidget* target, FluFlyoutPosition position /
     m_okBtn->setFixedWidth(100);
     setFixedWidth(260);
 
-    m_okBtn->setText("Ok");
-    m_cancelBtn->setText("Cancel");
+    m_okBtn->setText(tr("Ok"));
+    m_cancelBtn->setText(tr("Cancel"));
 
     connect(m_okBtn, &FluStyleButton::clicked, [=]() { close(); });
     connect(m_cancelBtn, &FluPushButton::clicked, [=]() { close(); });
@@ -62,12 +62,5 @@ void FluConfirmFlyout::paintEvent(QPaintEvent* event)
 
 void FluConfirmFlyout::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluConfirmFlyout.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluConfirmFlyout.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluConfirmFlyout.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

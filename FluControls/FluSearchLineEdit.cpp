@@ -28,7 +28,7 @@ FluSearchLineEdit::FluSearchLineEdit(QWidget* parent /*= nullptr*/) : FluWidget(
 
     connect(m_btn, &QPushButton::clicked, [=]() { emit onSearchBtnClicked(); });
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSearchLineEdit.qss", this);
+    onThemeChanged();
 }
 
 QString FluSearchLineEdit::getText()
@@ -98,11 +98,11 @@ void FluSearchLineEdit::onThemeChanged()
     if (FluThemeUtils::isLightTheme())
     {
         m_btn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Search, FluTheme::Light));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSearchLineEdit.qss", this);
+        // FluStyleSheetUitls::setQssByFileName("../StyleSheet/light/FluSearchLineEdit.qss", this);
     }
     else
     {
         m_btn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Search, FluTheme::Dark));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluSearchLineEdit.qss", this);
+        // FluStyleSheetUitls::setQssByFileName("../StyleSheet/dark/FluSearchLineEdit.qss", this);
     }
 }

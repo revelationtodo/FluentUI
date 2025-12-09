@@ -1,4 +1,4 @@
-#include "FluHCard.h"
+﻿#include "FluHCard.h"
 
 FluHCard::FluHCard(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
@@ -12,14 +12,14 @@ FluHCard::FluHCard(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 
     m_iconLabel = new QLabel(this);
     m_iconLabel->setFixedSize(50, 50);
-    QPixmap pixmap = QPixmap("/resources/images/ControlImages/Placeholder.png");
+    QPixmap pixmap = FluIconUtils::getPixmap(("../res/ControlImages/Placeholder.png"));
     pixmap = pixmap.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     m_iconLabel->setPixmap(pixmap);
 
-    m_titleLabel = new QLabel("this");
+    m_titleLabel = new QLabel;
     m_titleLabel->setText("AnimatedIcon");
 
-    m_contextLabel = new QLabel(this);
+    m_contextLabel = new QLabel;
     m_contextLabel->setText("An element that displays and controls an icon that animates when the user interacts with the controls.");
 
     m_titleLabel->setWordWrap(true);
@@ -36,8 +36,7 @@ FluHCard::FluHCard(QWidget* parent /*= nullptr*/) : FluWidget(parent)
     rightLayout->addWidget(m_titleLabel);
     rightLayout->addWidget(m_contextLabel);
 
-    QString qss = FluStyleSheetUitls::getQssByFileName("/resources/qss/light/FluHCard.qss");
-    setStyleSheet(qss);
+    onThemeChanged();
 }
 
 FluHCard::FluHCard(QPixmap icon, QString titleText, QString contextText, QWidget* parent /*= nullptr*/) : FluHCard(parent)
@@ -74,12 +73,5 @@ void FluHCard::paintEvent(QPaintEvent* event)
 
 void FluHCard::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHCard.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluHCard.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluHCard.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

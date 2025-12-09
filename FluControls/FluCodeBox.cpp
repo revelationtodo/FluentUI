@@ -1,4 +1,4 @@
-#include "FluCodeBox.h"
+﻿#include "FluCodeBox.h"
 
 FluCodeBox::FluCodeBox(QWidget* parent /*= nullptr*/) : QTextEdit(parent)
 {
@@ -8,7 +8,7 @@ FluCodeBox::FluCodeBox(QWidget* parent /*= nullptr*/) : QTextEdit(parent)
     setFocusPolicy(Qt::FocusPolicy::NoFocus);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCodeBox.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
@@ -24,14 +24,17 @@ void FluCodeBox::resizeEvent(QResizeEvent*)
     setFixedHeight(newHeight);
 }
 
+// bool FluCodeBox::eventFilter(QObject* object, QEvent* event)
+// {
+//     if (event->type() == QEvent::Wheel)
+//     {
+//         return true;
+//     }
+
+//     return false;
+// }
+
 void FluCodeBox::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCodeBox.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCodeBox.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluCodeBox.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

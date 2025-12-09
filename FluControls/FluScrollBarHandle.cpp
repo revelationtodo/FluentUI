@@ -25,16 +25,8 @@ void FluScrollBarHandle::paintEvent(QPaintEvent* event)
         nR = height() / 2;
     }
 
-    QColor color;
-    if (FluThemeUtils::isLightTheme())
-    {
-        color = QColor(138, 138, 138);
-    }
-    else if (FluThemeUtils::isDarkTheme())
-    {
-        color = QColor(159, 159, 159);
-    }
+    // QColor color;
 
-    painter.setBrush(QBrush(color));
+    painter.setBrush(QBrush(m_handleBackgroundColor));
     painter.drawRoundedRect(rect(), nR, nR);
 }

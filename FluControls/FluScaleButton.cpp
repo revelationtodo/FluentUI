@@ -72,14 +72,6 @@ void FluScaleButton::mouseReleaseEvent(QMouseEvent* e)
 
 void FluScaleButton::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        scaleByPercentage(m_currentPercentage);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluScaleButton.qss", this);
-    }
-    else
-    {
-        scaleByPercentage(m_currentPercentage);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluScaleButton.qss", this);
-    }
+    scaleByPercentage(m_currentPercentage);
+    FluStyleSheetUitls::setQssByFileName("FluScaleButton.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

@@ -36,7 +36,7 @@ FluCalendarSelectYearView::FluCalendarSelectYearView(QWidget* parent) : FluWidge
                 // m_parentView->getSelectMonthView()->setYearMonth(itemDate.year(), itemDate.month());
                 // m_parentView->getViewTitle()->setYearMonth(itemDate.year(), itemDate.month());
 
-                LOG_DEBUG << "item Clicked!";
+                // LOG_DEBUG << "item Clicked!";
             });
 
             m_labelList.append(label);
@@ -49,7 +49,7 @@ FluCalendarSelectYearView::FluCalendarSelectYearView(QWidget* parent) : FluWidge
     setYears(curDate.year(), curDate.month());
 
     setFixedHeight(300);
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarSelectYearView.qss", this);
+    onThemeChanged();
 }
 
 FluCalendarItem* FluCalendarSelectYearView::getItem(int nIndex)
@@ -180,12 +180,5 @@ void FluCalendarSelectYearView::getRange(int nYear, int& nStartYear, int& nEndYe
 
 void FluCalendarSelectYearView::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarSelectYearView.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarSelectYearView.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluCalendarSelectYearView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

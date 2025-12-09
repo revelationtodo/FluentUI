@@ -1,14 +1,17 @@
-#include "FluInfoBadge.h"
+﻿#include "FluInfoBadge.h"
 
 FluInfoBadge::FluInfoBadge(QWidget* parent /*= nullptr*/) : QLabel(parent)
 {
     setWordWrap(true);
-    setAlignment(Qt::AlignCenter);
+    // setAlignment(Qt::AlignCenter);
+    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_TransparentForMouseEvents);
     setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluInfoBadge.qss", this);
     m_parent = nullptr;
     m_target = nullptr;
+    onThemeChanged();
+    connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
 void FluInfoBadge::setParent(QWidget* parent)
@@ -27,6 +30,16 @@ QWidget* FluInfoBadge::getTarget()
     return m_target;
 }
 
+QColor FluInfoBadge::getBadgeColor()
+{
+    return m_badgeColor;
+}
+
+void FluInfoBadge::setBadgeColor(QColor color)
+{
+    m_badgeColor = color;
+}
+
 bool FluInfoBadge::eventFilter(QObject* watched, QEvent* event)
 {
     if (m_parent == nullptr || m_target == nullptr)
@@ -43,7 +56,7 @@ bool FluInfoBadge::eventFilter(QObject* watched, QEvent* event)
     return QLabel::eventFilter(watched, event);
 }
 
-void FluInfoBadge::setInfoBadge(QWidget* parent, QWidget* target, int nVlaue /*= 0*/)
+void FluInfoBadge::setInfoBadge(QWidget* parent, QWidget* target, FluInfoBadgeLevel level, int nVlaue /*= 0*/)
 {
     if (parent == nullptr || target == nullptr)
         return;
@@ -56,6 +69,7 @@ void FluInfoBadge::setInfoBadge(QWidget* parent, QWidget* target, int nVlaue /*=
 
     FluInfoBadge* infoBadge = new FluInfoBadge(parent);
     infoBadge->setText(valueText);
+    infoBadge->setLevel(level);
     infoBadge->adjustSize();
 
     infoBadge->setParent(parent);
@@ -63,4 +77,15 @@ void FluInfoBadge::setInfoBadge(QWidget* parent, QWidget* target, int nVlaue /*=
 
     target->installEventFilter(infoBadge);
     infoBadge->move(target->x() + target->width() - infoBadge->width() / 2, target->y() - infoBadge->height() / 2);
+}
+
+void FluInfoBadge::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(getBadgeColor());
+    // int nR = height() / 2;
+    painter.drawRoundedRect(rect(), height() / 2, height() / 2);
+    QLabel::paintEvent(event);
 }

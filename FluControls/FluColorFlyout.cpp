@@ -1,8 +1,8 @@
-#include "FluColorFlyout.h"
+﻿#include "FluColorFlyout.h"
 
 FluColorFlyout::FluColorFlyout(QWidget* targetWidget) : FluWidget(nullptr), m_targetWidget(targetWidget)
 {
-    LOG_DEBUG << "called";
+    // LOG_DEBUG << "called";
 
     m_gridLayout = new QGridLayout;
     setLayout(m_gridLayout);
@@ -18,7 +18,7 @@ FluColorFlyout::FluColorFlyout(QWidget* targetWidget) : FluWidget(nullptr), m_ta
 
 FluColorFlyout::~FluColorFlyout()
 {
-    LOG_DEBUG << "called";
+    // LOG_DEBUG << "called";
 }
 
 void FluColorFlyout::addColorButton(FluColorButton* colorBtn, int row, int col)
@@ -60,12 +60,5 @@ void FluColorFlyout::paintEvent(QPaintEvent* event)
 
 void FluColorFlyout::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluColorFlyout.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluColorFlyout.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluColorFlyout.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

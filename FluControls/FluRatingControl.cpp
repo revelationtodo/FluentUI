@@ -7,15 +7,7 @@ FluRatingControl::FluRatingControl(QWidget* parent /*= nullptr*/) : FluWidget(pa
 
     addStar();
     setFixedSize(170, 45);
-
-    if (FluThemeUtils::isDarkTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluRatingControl.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluRatingControl.qss", this);
-    }
+    onThemeChanged();
 }
 
 void FluRatingControl::addStar()
@@ -69,12 +61,5 @@ void FluRatingControl::paintEvent(QPaintEvent* event)
 
 void FluRatingControl::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluRatingControl.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluRatingControl.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluRatingControl.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

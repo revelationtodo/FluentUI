@@ -1,4 +1,4 @@
-#include "FluVNavigationSettingsItem.h"
+﻿#include "FluVNavigationSettingsItem.h"
 #include "FluVNavigationView.h"
 
 FluVNavigationSettingsItem::FluVNavigationSettingsItem(QIcon icon, QString text, QWidget* parent /*= nullptr*/) : FluVNavigationItem(parent)
@@ -34,15 +34,20 @@ FluVNavigationSettingsItem::FluVNavigationSettingsItem(QIcon icon, QString text,
     m_hMainLayout->addWidget(m_label, 1);
     m_hMainLayout->setSpacing(0);
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVNavigationSettingsItem.qss", this);
+    onThemeChanged();
     connect(m_icon, &FluRotationButton::clicked, [=](bool b) { emit itemClicked(); });
     connect(this, &FluVNavigationSettingsItem::itemClicked, this, &FluVNavigationSettingsItem::onItemClicked);
 }
 
 FluVNavigationSettingsItem::FluVNavigationSettingsItem(FluAwesomeType awesomeType, QString text, QWidget* parent) : FluVNavigationSettingsItem(QIcon(), text, parent)
 {
-    m_icon->setIcon(FluIconUtils::getFluentIcon(awesomeType));
+    m_icon->setIcon(FluIconUtils::getFluentIcon(awesomeType, FluThemeUtils::getUtils()->getTheme()));
     m_icon->setAwesomeType(awesomeType);
+}
+
+QLabel* FluVNavigationSettingsItem::getLabel()
+{
+    return m_label;
 }
 
 void FluVNavigationSettingsItem::hideLabel()
@@ -111,12 +116,5 @@ void FluVNavigationSettingsItem::onItemClicked()
 
 void FluVNavigationSettingsItem::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVNavigationSettingsItem.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluVNavigationSettingsItem.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluVNavigationSettingsItem.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

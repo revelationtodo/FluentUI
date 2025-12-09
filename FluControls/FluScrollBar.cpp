@@ -1,9 +1,9 @@
-#include "FluScrollBar.h"
+﻿#include "FluScrollBar.h"
 #include "FluScrollArea.h"
 #include "FluScrollBarHandle.h"
 
 FluScrollBar::FluScrollBar(Qt::Orientation orientation, QAbstractScrollArea* scrollArea /*= nullptr*/)
-    : QWidget(scrollArea), m_scrollArea(scrollArea), m_orientation(orientation), m_nMaxValue(0), m_nMinValue(0), m_nCurrentValue(0), m_nPadding(14), m_nPageStep(50), m_bHideScrollBar(false)
+    : FluWidget(scrollArea), m_scrollArea(scrollArea), m_orientation(orientation), m_nMaxValue(0), m_nMinValue(0), m_nCurrentValue(0), m_nPadding(14), m_nPageStep(50), m_bHideScrollBar(false), m_bExpanded(false)
 {
     m_scrollBarTrunk = new FluScrollBarTrunk(orientation, this);
     m_scrollBarHandle = new FluScrollBarHandle(orientation, this);
@@ -23,6 +23,7 @@ FluScrollBar::FluScrollBar(Qt::Orientation orientation, QAbstractScrollArea* scr
     connect(m_scrollBar, &QScrollBar::valueChanged, this, &FluScrollBar::onCurrentValueChanged);
     connect(this, &FluScrollBar::currentValueChanged, m_scrollBar, [=](int nValue) { m_scrollBar->setValue(nValue); });
     connect(m_scrollBarTrunk->getAnimation(), &QPropertyAnimation::valueChanged, this, &FluScrollBar::onOpacityAnimationChanged);
+    onThemeChanged();
 }
 
 Qt::Orientation FluScrollBar::getOrientation()
@@ -156,11 +157,17 @@ void FluScrollBar::adjustScrollBarPosAndSize(QSize scrollAreaSize)
     {
         resize(12, scrollAreaSize.height() - 2);
         move(scrollAreaSize.width() - 13, 1);
+
+        adjustHandleSize();
+        adjustHandlePos();
     }
     else if (m_orientation == Qt::Horizontal)
     {
         resize(scrollAreaSize.width() - 2, 12);
         move(1, scrollAreaSize.height() - 13);
+
+        adjustHandleSize();
+        adjustHandlePos();
     }
 }
 
@@ -234,6 +241,26 @@ void FluScrollBar::adjustHandleSize()
 
         m_scrollBarHandle->setFixedWidth(nHanldeW);
     }
+}
+
+QColor FluScrollBar::getTrunkBackgoundColor()
+{
+    return m_scrollBarTrunk->getTrunkBackgoundColor();
+}
+
+void FluScrollBar::setTrunkBackgoundColor(QColor color)
+{
+    m_scrollBarTrunk->setTrunkBackgoundColor(color);
+}
+
+QColor FluScrollBar::getHandleBackgroundColor()
+{
+    return m_scrollBarHandle->getHandleBackgroundColor();
+}
+
+void FluScrollBar::setHandleBackgroundColor(QColor color)
+{
+    m_scrollBarHandle->setHandleBackgroundColor(color);
 }
 
 bool FluScrollBar::eventFilter(QObject* watched, QEvent* event)
@@ -381,4 +408,12 @@ void FluScrollBar::onOpacityAnimationChanged(const QVariant& value)
         m_scrollBarHandle->setFixedHeight(3 + opacity * 3);
     }
     adjustHandlePos();
+}
+
+void FluScrollBar::onThemeChanged()
+{
+    FluStyleSheetUitls::setQssByFileName("FluScrollBar.qss", this, FluThemeUtils::getUtils()->getTheme());
+    m_scrollBarHandle->update();
+    m_scrollBarTrunk->update();
+    update();
 }

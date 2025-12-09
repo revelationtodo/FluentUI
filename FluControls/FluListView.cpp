@@ -1,24 +1,16 @@
-#include "FluListView.h"
+﻿#include "FluListView.h"
 
 FluListView::FluListView(QWidget* parent /*= nullptr*/) : QListWidget(parent)
 {
-    setItemDelegate(new FluListViewItemDelegate);
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluListView.qss", this);
+    m_listViewItemDelegate = new FluListViewItemDelegate;
+    setItemDelegate(m_listViewItemDelegate);
+
+    m_delegate = new FluScrollDelegate(this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
 void FluListView::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluListView.qss", this);
-        //  style()->polish(this);
-        //    setItemDelegate(new FluListViewItemDelegate);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluListView.qss", this);
-        //  style()->polish(this);
-        //  setItemDelegate(new FluListViewItemDelegate);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluListView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

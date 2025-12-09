@@ -1,4 +1,4 @@
-#include "FluTextToggleSwitchEx.h"
+﻿#include "FluTextToggleSwitchEx.h"
 
 FluTextToggleSwitchEx::FluTextToggleSwitchEx(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
@@ -14,7 +14,7 @@ FluTextToggleSwitchEx::FluTextToggleSwitchEx(QWidget* parent /*= nullptr*/) : Fl
     m_hMainLayout->addWidget(m_toggleSwithEx);
     m_hMainLayout->addWidget(m_textLabel);
 
-    setText("on", "off");
+    setText(tr("on"), tr("off"));
     m_textLabel->setText(m_offText);
     connect(m_toggleSwithEx, &FluToggleSwitchEx::toggled, [=](bool bChecked) {
         if (bChecked)
@@ -25,11 +25,11 @@ FluTextToggleSwitchEx::FluTextToggleSwitchEx(QWidget* parent /*= nullptr*/) : Fl
         {
             m_textLabel->setText(m_offText);
         }
-        
+
         emit stateChanged(bChecked);
     });
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTextToggleSwithEx.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
@@ -47,12 +47,5 @@ void FluTextToggleSwitchEx::setChecked(bool checked)
 
 void FluTextToggleSwitchEx::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTextToggleSwithEx.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluTextToggleSwithEx.qss", this);
-    }
+    // FluStyleSheetUitls::setQssByFileName("FluTextToggleSwithEx.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

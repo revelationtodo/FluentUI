@@ -1,5 +1,6 @@
 #include "FluStyleSheetUitls.h"
-#include <QDir>
+// #include <QFileInfo>
+// #include <QDir>
 
 FluStyleSheetUitls *FluStyleSheetUitls::m_styleSheetUtils = nullptr;
 FluStyleSheetUitls::FluStyleSheetUitls(QObject *object /*= nullptr*/) : QObject(object)
@@ -8,6 +9,10 @@ FluStyleSheetUitls::FluStyleSheetUitls(QObject *object /*= nullptr*/) : QObject(
     m_timer = new QTimer;
     m_timer->start(5000);
     // #endif
+    m_styleSheetDir = "../StyleSheet/";
+#ifdef USE_QRC
+    m_styleSheetDir = ":/StyleSheet/";
+#endif
 }
 
 QString FluStyleSheetUitls::getQssByFileName(const QString &fileName)
@@ -26,18 +31,15 @@ QString FluStyleSheetUitls::getQssByFileName(const QString &fileName)
 void FluStyleSheetUitls::setQssByFileName(const QString &fileName, QWidget *widget, bool bDebugQss)
 {
     QString qss = FluStyleSheetUitls::getQssByFileName(fileName);
+    // QString absolutePath = QDir("../").absolutePath();
+
+#ifdef USE_QRC
+    doForQrcQssText(qss);
+#endif
+
     if (widget != nullptr)
     {
         widget->setStyleSheet(qss);
-
-        // if (bDebugQss)
-        //{
-        //     // just change file
-        //     connect(FluStyleSheetUitls::getTimer(), &QTimer::timeout, [=]() {
-        //         QString qss = FluStyleSheetUitls::getQssByFileName(fileName);
-        //         widget->setStyleSheet(qss);
-        //     });
-        // }
     }
 }
 
@@ -139,12 +141,22 @@ void FluStyleSheetUitls::drawBottomLineIndicator(QWidget *widget, QPainter *pain
     {
         brush = QBrush(QColor(0, 90, 158));
     }
-    else
+    else if (FluThemeUtils::isDarkTheme())
     {
         brush = QBrush(QColor(118, 185, 237));
     }
+    else if (FluThemeUtils::isAtomOneDarkTheme())
+    {
+        brush = QBrush(QColor(82, 139, 255));
+    }
 
     painter->fillPath(path, brush);
+}
+
+void FluStyleSheetUitls::doForQrcQssText(QString &data)
+{
+    // inner do for qss text;
+    data.replace("../res/", ":/res/");
 }
 
 FluStyleSheetUitls *FluStyleSheetUitls::getUtils()

@@ -1,4 +1,4 @@
-#include "FluTabBarItem.h"
+﻿#include "FluTabBarItem.h"
 
 FluTabBarItem::FluTabBarItem(QWidget* parent /*= nullptr*/)
 {
@@ -12,15 +12,17 @@ FluTabBarItem::FluTabBarItem(QWidget* parent /*= nullptr*/)
     m_closeBtn = new QPushButton(this);
 
     m_iconBtn->setFixedSize(30, 30);
-    m_closeBtn->setFixedSize(30, 20);
+    m_closeBtn->setFixedSize(24, 16);
 
     m_iconBtn->setIconSize(QSize(25, 25));
-    m_closeBtn->setIconSize(QSize(15, 15));
+    m_closeBtn->setIconSize(QSize(12, 12));
     m_textBtn->setFixedHeight(30);
     m_textBtn->setText("Document");
 
     m_iconBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Document));
-    m_closeBtn->setIcon(FluIconUtils::getFluentIconPixmap(FluAwesomeType::ChromeClose));
+
+    QIcon closeIcon = FluIconUtils::getFluentIconPixmap(FluAwesomeType::ChromeClose).scaled(12, 12);
+    m_closeBtn->setIcon(closeIcon);
 
     m_iconBtn->setObjectName("iconBtn");
     m_textBtn->setObjectName("textBtn");
@@ -35,9 +37,7 @@ FluTabBarItem::FluTabBarItem(QWidget* parent /*= nullptr*/)
     //   setFixedWidth(240);
 
     connect(m_iconBtn, &QPushButton::clicked, [=]() { emit clicked(); });
-
     connect(m_textBtn, &QPushButton::clicked, [=]() { emit clicked(); });
-
     connect(m_closeBtn, &QPushButton::clicked, [=]() { emit clickedCloseBtn(this); });
     FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTabBarItem.qss", this);
 }

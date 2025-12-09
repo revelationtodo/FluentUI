@@ -2,8 +2,6 @@
 
 FluCircleDot::FluCircleDot(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
-    // FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluInfoBadge.qss", this);
-
     setFixedSize(11, 11);
     onThemeChanged();
     m_target = parent;
@@ -62,12 +60,5 @@ void FluCircleDot::setCircleDot(QWidget* target, int nMarginTop, int nMarginRigh
 
 void FluCircleDot::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCircleDot.qss", this);
-    }
-    else if (FluThemeUtils::isDarkTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCircleDot.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluCircleDot.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

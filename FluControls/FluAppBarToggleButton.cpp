@@ -22,7 +22,6 @@ FluAppBarToggleButton::FluAppBarToggleButton(FluAwesomeType awesomeType, QWidget
     m_vMainLayout->addWidget(m_textLabel);
 
     m_iconBtn->setIcon(FluIconUtils::getFluentIconPixmap(awesomeType, FluThemeUtils::getUtils()->getTheme()));
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluAppBarToggleButton.qss", this);
 
     setToggled(m_bToggled);
 
@@ -35,6 +34,8 @@ FluAppBarToggleButton::FluAppBarToggleButton(FluAwesomeType awesomeType, QWidget
 
         update();
     });
+
+    onThemeChanged();
 }
 
 void FluAppBarToggleButton::updateIcon()
@@ -116,14 +117,6 @@ void FluAppBarToggleButton::paintEvent(QPaintEvent* event)
 
 void FluAppBarToggleButton::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluAppBarToggleButton.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluAppBarToggleButton.qss", this);
-    }
-
+    FluStyleSheetUitls::setQssByFileName("FluAppBarToggleButton.qss", this, FluThemeUtils::getUtils()->getTheme());
     updateIcon();
 }

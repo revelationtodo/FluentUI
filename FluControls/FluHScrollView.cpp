@@ -13,7 +13,7 @@ FluHScrollView::FluHScrollView(QWidget* parent /*= nullptr*/) : QScrollArea(pare
     m_hMainLayout = new QHBoxLayout(m_contextWidget);
     m_contextWidget->setObjectName("contextWidget");
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHScrollView.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
@@ -38,12 +38,5 @@ void FluHScrollView::wheelEvent(QWheelEvent* event)
 
 void FluHScrollView::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHScrollView.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluHScrollView.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluHScrollView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

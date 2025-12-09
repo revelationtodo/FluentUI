@@ -75,12 +75,5 @@ void FluSettingsVersionBox::addWidget(QWidget* widget)
 
 void FluSettingsVersionBox::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSettingsVersionBox.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluSettingsVersionBox.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluSettingsVersionBox.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

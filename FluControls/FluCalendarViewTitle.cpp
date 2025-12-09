@@ -8,8 +8,7 @@ FluCalendarViewTitle::FluCalendarViewTitle(QWidget* parent /*= nullptr*/) : FluW
     setLayout(m_hMainLayout);
 
     m_yearMonthBtn = new FluPushButton;
-    m_yearMonthBtn->setFixedHeight(30);
-    m_yearMonthBtn->setText("January 2000");
+    m_yearMonthBtn->setText(tr("January 2000"));
     m_hMainLayout->addWidget(m_yearMonthBtn);
 
     m_preBtn = new FluIconButton(FluAwesomeType::CaretSolidUp);
@@ -23,11 +22,7 @@ FluCalendarViewTitle::FluCalendarViewTitle(QWidget* parent /*= nullptr*/) : FluW
     m_nextBtn->setObjectName("nextBtn");
 
     setFixedHeight(50);
-
-    FluStyleSheetUitls::setQssByFileName("./resources/qss/light/FluCalendarViewTitle.qss", m_yearMonthBtn);
-    FluStyleSheetUitls::setQssByFileName("./resources/qss/light/FluCalendarViewTitle.qss", m_preBtn);
-    FluStyleSheetUitls::setQssByFileName("./resources/qss/light/FluCalendarViewTitle.qss", m_nextBtn);
-    FluStyleSheetUitls::setQssByFileName("./resources/qss/light/FluCalendarViewTitle.qss", this);
+    onThemeChanged();
 }
 
 FluPushButton* FluCalendarViewTitle::getYearMonthBtn()
@@ -50,10 +45,10 @@ void FluCalendarViewTitle::setYearMonth(int nYear, int nMonth)
     if (nYear > 2124 || nYear < 1924)
         return;
 
-    const QList<QString> monthTexts = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+    const QList<QString> monthTexts = {tr("January"), tr("February"), tr("March"), tr("April"), tr("May"), tr("June"), tr("July"), tr("August"), tr("September"), tr("October"), tr("November"), tr("December")};
     if (m_parentView->getViewState() == FluCVS_SelectDayView)
     {
-        QString yearMonthText = QString::asprintf("%s %d", monthTexts.at(nMonth - 1).toStdString().data(), nYear);
+        QString yearMonthText = QString::asprintf("%s %d", monthTexts.at(nMonth - 1).toUtf8().data(), nYear);
         m_yearMonthBtn->setText(yearMonthText);
     }
     else if (m_parentView->getViewState() == FluCVS_SelectMonthView)
@@ -78,18 +73,8 @@ void FluCalendarViewTitle::paintEvent(QPaintEvent* event)
 
 void FluCalendarViewTitle::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarViewTitle.qss", m_yearMonthBtn);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarViewTitle.qss", m_preBtn);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarViewTitle.qss", m_nextBtn);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarViewTitle.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarViewTitle.qss", m_yearMonthBtn);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarViewTitle.qss", m_preBtn);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarViewTitle.qss", m_nextBtn);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarViewTitle.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluCalendarViewTitle.qss", m_yearMonthBtn, FluThemeUtils::getUtils()->getTheme());
+    FluStyleSheetUitls::setQssByFileName("FluCalendarViewTitle.qss", m_preBtn, FluThemeUtils::getUtils()->getTheme());
+    FluStyleSheetUitls::setQssByFileName("FluCalendarViewTitle.qss", m_nextBtn, FluThemeUtils::getUtils()->getTheme());
+    FluStyleSheetUitls::setQssByFileName("FluCalendarViewTitle.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

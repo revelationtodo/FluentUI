@@ -1,9 +1,10 @@
-#include "FluVNavigationIconTextItem.h"
+﻿#include "FluVNavigationIconTextItem.h"
 #include "FluVNavigationMenuItem.h"
 #include <QStyle>
 #include "../FluUtils/FluUtils.h"
 #include "FluVNavigationView.h"
 #include "FluVNavigationFlyIconTextItem.h"
+#include <QThread>
 
 FluVNavigationIconTextItem::FluVNavigationIconTextItem(QWidget *parent /*= nullptr*/) : FluVNavigationItem(parent)
 {
@@ -40,6 +41,7 @@ FluVNavigationIconTextItem::FluVNavigationIconTextItem(QWidget *parent /*= nullp
     m_indicator = new QWidget(this);
     m_iconBtn = new QPushButton(this);
     m_label = new QLabel("Home");
+    m_label->setWordWrap(false);
     m_arrow = new QPushButton(this);
 
     m_hLayout1->setSpacing(0);
@@ -57,7 +59,7 @@ FluVNavigationIconTextItem::FluVNavigationIconTextItem(QWidget *parent /*= nullp
     m_indicator->setFixedHeight(18);
     m_indicator->setFixedWidth(4);
     m_iconBtn->setFixedSize(30, 30);
-    m_label->setWordWrap(true);
+    // m_label->setWordWrap(true);
 
     m_vLayout1->setContentsMargins(0, 0, 0, 0);
     m_vLayout1->setSpacing(5);
@@ -67,10 +69,10 @@ FluVNavigationIconTextItem::FluVNavigationIconTextItem(QWidget *parent /*= nullp
     m_arrow->setObjectName("arrow");
 
     m_iconBtn->setIconSize(QSize(24, 24));
-    m_iconBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Home));
+    m_iconBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Home, FluThemeUtils::getUtils()->getTheme()));
 
     m_arrow->setIconSize(QSize(18, 18));
-    m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown));
+    m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, FluThemeUtils::getUtils()->getTheme()));
     m_arrow->setFixedWidth(25);
     m_bDown = true;
     m_bLong = true;
@@ -85,6 +87,7 @@ FluVNavigationIconTextItem::FluVNavigationIconTextItem(QWidget *parent /*= nullp
     m_parentItem = nullptr;
     m_parentView = nullptr;
 
+    setState(FluVNavigationState::Collapsed);
     connect(m_arrow, &QPushButton::clicked, this, [=](bool b) { emit itemClicked(); });
     connect(m_iconBtn, &QPushButton::clicked, this, [=](bool b) { emit itemClicked(); });
     connect(this, &FluVNavigationIconTextItem::itemClicked, this, [=]() { onItemClicked(); });
@@ -102,18 +105,17 @@ FluVNavigationIconTextItem::FluVNavigationIconTextItem(QString text, QWidget *pa
 {
     m_iconBtn->hide();
     m_bHideIcon = true;
-    // m_icon->setIcon(QIcon());
     m_label->setText(text);
 }
 
 FluVNavigationIconTextItem::FluVNavigationIconTextItem(FluAwesomeType awesomeType, QString text, QWidget *parent /*= nullptr*/) : FluVNavigationIconTextItem(parent)
 {
     m_awesomeType = awesomeType;
-    m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType));
+    m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluThemeUtils::getUtils()->getTheme()));
     m_label->setText(text);
 }
 
-FluVNavigationIconTextItem::FluVNavigationIconTextItem(FluVNavigationIconTextItem *item) : FluVNavigationIconTextItem()
+FluVNavigationIconTextItem::FluVNavigationIconTextItem(FluVNavigationIconTextItem *item, QWidget *parent /*= nullptr*/) : FluVNavigationIconTextItem(parent)
 {
     itemClone(item);
     onThemeChanged();
@@ -121,12 +123,13 @@ FluVNavigationIconTextItem::FluVNavigationIconTextItem(FluVNavigationIconTextIte
 
 void FluVNavigationIconTextItem::itemClone(FluVNavigationIconTextItem *item)
 {
+    // LOG_DEBUG << "Clone Item:" << item->getLabel()->text();
     m_iconBtn->setIcon(item->getIconBtn()->icon());
     m_label->setText(item->getLabel()->text());
     m_awesomeType = item->getAwesomeType();
 
     m_bHideIcon = item->getHideIcon();
-
+    m_key = item->getKey();
     if (m_bHideIcon)
         m_iconBtn->hide();
 
@@ -137,6 +140,22 @@ void FluVNavigationIconTextItem::itemClone(FluVNavigationIconTextItem *item)
         newItem->itemClone(tmpItem);
         addItem(newItem);
     }
+}
+
+void FluVNavigationIconTextItem::setItemWidth(int nWidth)
+{
+    // set child item width
+    for (auto item : m_items)
+    {
+        item->getWrapWidget1()->setFixedWidth(nWidth);
+        item->getWrapWidget2()->setFixedWidth(nWidth);
+        item->setFixedWidth(nWidth);
+    }
+
+    // set self width
+    m_wrapWidget1->setFixedWidth(nWidth);
+    m_wrapWidget2->setFixedWidth(nWidth);
+    setFixedWidth(nWidth);
 }
 
 std::vector<FluVNavigationIconTextItem *> FluVNavigationIconTextItem::getItems()
@@ -163,22 +182,16 @@ std::vector<FluVNavigationIconTextItem *> FluVNavigationIconTextItem::getAllItem
 
 void FluVNavigationIconTextItem::addItem(FluVNavigationIconTextItem *item)
 {
-    // item->m_currentWidth = m_currentWidth - 36;
     item->m_parentItem = this;
     m_items.push_back(item);
-
-    int nDepth = item->getDepth();
-    item->m_emptyWidget->setFixedWidth(36 * nDepth);
-    item->show();
-
+    updateDepth(item);
     m_vLayout1->addWidget(item);
-    // m_vLayout1->addSpacing(15);
     m_arrow->show();
 }
 
 int FluVNavigationIconTextItem::calcItemW1Width()
 {
-    QMargins margins = m_wrapWidget1->contentsMargins();
+    QMargins margins = m_hLayout1->contentsMargins();
     int nIndicatorWidth = m_indicator->width();
 
     int nIconWidth = m_iconBtn->width();
@@ -186,7 +199,8 @@ int FluVNavigationIconTextItem::calcItemW1Width()
         nIconWidth = 0;
 
     int nSpacing = 8;
-    int nLabelWidth = m_label->fontMetrics().boundingRect(m_label->text()).width();
+    // m_label->show();
+    int nLabelWidth = m_label->fontMetrics().horizontalAdvance(m_label->text());
     int nArrowWidth = m_arrow->width();
 
     if (m_items.empty())
@@ -199,32 +213,92 @@ int FluVNavigationIconTextItem::calcItemW1Width()
     // LOG_DEBUG << "nSpacing:" << nSpacing;
     // LOG_DEBUG << "nLabelWidth:" << nLabelWidth;
     // LOG_DEBUG << "nArrowWidth:" << nArrowWidth;
-    // LOG_DEBUG << "W1 width:" << margins.left() + nIndicatorWidth + nIconWidth + nSpacing + nLabelWidth + nArrowWidth + margins.right();
+    // LOG_DEBUG << "getDepth:" << getDepth();
 
-    return margins.left() + nIndicatorWidth + nIconWidth + nSpacing + nLabelWidth + nArrowWidth + margins.right() + 20;
+    int nCurentWidth = margins.left() + nIndicatorWidth + nIconWidth + nSpacing + nLabelWidth + nArrowWidth + margins.right() + 36 * getDepth();
+    // LOG_DEBUG << "W1 width:" << nCurentWidth;
+    return nCurentWidth;
+}
+
+int FluVNavigationIconTextItem::calcItemWidth()
+{
+    int nCurrentWidth = calcItemW1Width();
+    int nLayoutCount = m_vLayout1->count();
+
+    for (int i = 0; i < nLayoutCount; i++)
+    {
+        if (getState() != FluVNavigationState::Expanded && getState() != FluVNavigationState::Expanding)
+        {
+            break;
+        }
+        auto tmpItem = (FluVNavigationIconTextItem *)m_vLayout1->itemAt(i)->widget();
+        int nTmpWidth = tmpItem->calcItemW1Width();
+        if (nTmpWidth > nCurrentWidth)
+            nCurrentWidth = nTmpWidth;
+    }
+
+    if (getState() == FluVNavigationState::Expanded)
+        nCurrentWidth = qMax(width(), nCurrentWidth);
+
+    return nCurrentWidth;
 }
 
 int FluVNavigationIconTextItem::calcItemW2Height(FluVNavigationIconTextItem *item)
 {
     int nH = 0;
-    for (int i = 0; i < item->m_vLayout1->count(); i++)
+    int nLayoutCount = item->m_vLayout1->count();
+    for (int i = 0; i < nLayoutCount; i++)
     {
         auto tmpItem = (FluVNavigationIconTextItem *)item->m_vLayout1->itemAt(i)->widget();
-        nH += tmpItem->height() + 5;
+        nH += tmpItem->height();
     }
-    nH = nH + 5;
+    nH = nH + 5 * (nLayoutCount - 1) + m_vLayout1->contentsMargins().top() + m_vLayout1->contentsMargins().bottom();
     return nH;
+}
+
+void FluVNavigationIconTextItem::adjustItemWidth()
+{
+    adjustItemWidth(this);
+}
+void FluVNavigationIconTextItem::adjustItemWidth(FluVNavigationIconTextItem *item)
+{
+    if (item == nullptr)
+    {
+        return;
+    }
+
+    // LOG_DEBUG << "item:" << item->getLabel();
+    int nMaxWidth = calcItemWidth();
+    item->setItemWidth(nMaxWidth);
+    adjustItemWidth(item->m_parentItem);
 }
 
 void FluVNavigationIconTextItem::adjustItemHeight(FluVNavigationIconTextItem *item)
 {
     if (item == nullptr)
+    {
         return;
+    }
 
     int nH = calcItemW2Height(item);
     item->m_wrapWidget2->setFixedHeight(nH);
-    item->setFixedHeight(item->m_wrapWidget1->height() + item->m_wrapWidget2->height());
+    item->setFixedHeight(item->m_wrapWidget1->height() + item->m_wrapWidget2->height() + m_vMainLayout->spacing() + m_vMainLayout->contentsMargins().top() + m_vMainLayout->contentsMargins().bottom());
     adjustItemHeight(item->m_parentItem);
+}
+
+void FluVNavigationIconTextItem::adjustFlyItemHeight(FluVNavigationFlyIconTextItem *flyItem)
+{
+    if (flyItem == nullptr)
+        return;
+
+    flyItem->adjustItemHeight();
+}
+
+void FluVNavigationIconTextItem::adjustFlyItemWidth(FluVNavigationFlyIconTextItem *flyItem)
+{
+    if (flyItem == nullptr)
+        return;
+    flyItem->adjustItemWidth();
 }
 
 int FluVNavigationIconTextItem::getDepth()
@@ -237,6 +311,22 @@ int FluVNavigationIconTextItem::getDepth()
         item = item->m_parentItem;
     }
     return nDepth;
+}
+
+void FluVNavigationIconTextItem::updateDepth(FluVNavigationIconTextItem *item)
+{
+    if (item == nullptr)
+        return;
+
+    int nDepth = item->getDepth();
+    item->m_emptyWidget->setFixedWidth(36 * nDepth);
+
+    // get sub items and update depth
+    for (auto tmpItem : item->getItems())
+    {
+        tmpItem->m_emptyWidget->setFixedWidth(36 * tmpItem->getDepth());
+        updateDepth(tmpItem);
+    }
 }
 
 FluVNavigationIconTextItem *FluVNavigationIconTextItem::getRootItem()
@@ -316,7 +406,7 @@ void FluVNavigationIconTextItem::mouseReleaseEvent(QMouseEvent *event)
 
 void FluVNavigationIconTextItem::onItemClicked()
 {
-    // LOG_DEBUG << "called";
+    LOG_WARN << "called";
     //  enableThisItem equal false just return it.
     if (!m_bEnableThisItem)
         return;
@@ -327,67 +417,89 @@ void FluVNavigationIconTextItem::onItemClicked()
     if (rootItem == nullptr)
         return;
 
-    // LOG_DEBUG << "get root item.";
+    LOG_WARN << "get root item.";
     auto navView = rootItem->getParentView();
-    // LOG_DEBUG << "bDown:" << m_bDown << "nav long:" << navView->isLong();
+    auto flyItem = rootItem->getFlyItem();
+    // LOG_WARN << "bDown:" << m_bDown << "nav long:" << navView->isLong();
 
     if ((navView != nullptr && m_bDown && navView->isLong()) || (navView == nullptr && isLong() && m_bDown))
     {
-        // m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronUp));
+        setState(FluVNavigationState::Expanding);
         m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronUp, FluThemeUtils::getUtils()->getTheme()));
 
+        // adjust height ---
         // display child
         if (m_items.size() > 0)
         {
             int nH = 0;
-            for (int i = 0; i < m_vLayout1->count(); i++)
+            int nLayout1Count = m_vLayout1->count();
+            for (int i = 0; i < nLayout1Count; i++)
             {
                 auto item = (FluVNavigationIconTextItem *)m_vLayout1->itemAt(i)->widget();
-                nH += item->height() + 5;
+                nH += item->height();
             }
-
+            nH = nH + m_vLayout1->spacing() * (nLayout1Count - 1) + m_vLayout1->contentsMargins().top() + m_vLayout1->contentsMargins().bottom();
             m_wrapWidget2->setFixedHeight(nH);
             m_wrapWidget2->show();
-            // set all item height;
-            setFixedHeight(m_wrapWidget1->height() + m_wrapWidget2->height() + 5);
+            setFixedHeight(m_wrapWidget1->height() + m_wrapWidget2->height() + m_vMainLayout->contentsMargins().top() + m_vMainLayout->contentsMargins().bottom() + m_vMainLayout->spacing());
         }
 
         adjustItemHeight(m_parentItem);
+        adjustFlyItemHeight(getFlyItem());
+
+        // adjust width
+        if (flyItem != nullptr)
+        {
+            if (getState() == FluVNavigationState::Expanding)
+            {
+                // int nMaxW = calcItemWidth();
+                // for (int i = 0; i < m_vLayout1->count(); i++)
+                //{
+                //     auto tmpItem = (FluVNavigationIconTextItem *)m_vLayout1->itemAt(i)->widget();
+                //     tmpItem->getWrapWidget1()->setFixedWidth(nMaxW);
+                //     tmpItem->getWrapWidget2()->setFixedWidth(nMaxW);
+                //     tmpItem->setFixedWidth(nMaxW);
+                // }
+                // adjustItemWidth(m_parentItem);
+
+                if (getLabel()->text() == tr("3-level"))
+                {
+                    QThread::sleep(1);
+                }
+
+                adjustItemWidth();
+                adjustFlyItemWidth(getFlyItem());
+            }
+        }
         m_wrapWidget2->show();
+
+        setState(FluVNavigationState::Expanded);
     }
 
     if ((navView != nullptr && !m_bDown && navView->isLong()) || (navView == nullptr && isLong() && !m_bDown))
     {
-        // m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown));
+        setState(FluVNavigationState::Collapsing);
         m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, FluThemeUtils::getUtils()->getTheme()));
-
         setFixedHeight(40);
         if (m_items.size() > 0)
         {
             m_wrapWidget2->hide();
             adjustItemHeight(m_parentItem);
+            adjustFlyItemHeight(getFlyItem());
+            adjustFlyItemWidth(getFlyItem());
         }
+        setState(FluVNavigationState::Collapsed);
     }
 
     if (navView != nullptr && !navView->isLong() && rootItem == this)
     {
         if (!getItems().empty())
         {
-            // LOG_DEBUG << "Clicked IconTextItem text:" << m_label->text();
-            //  log gemo
-            // LOG_DEBUG << "geometry:" << geometry();
-            // LOG_DEBUG << "x:" << x() << ","
-            //           << "y:" << y();
-            //  log global
             QPoint gPoint = mapToGlobal(QPoint(navView->width(), 0));
-            // show flyout icon text item;
-            // #ifdef _DEBUG
             auto flyIconTextItem = new FluVNavigationFlyIconTextItem;
-            LOG_DEBUG << flyIconTextItem;
             flyIconTextItem->setIconTextItems(getItems());
             flyIconTextItem->move(gPoint.x(), gPoint.y());
             flyIconTextItem->show();
-            // #endif
         }
     }
 

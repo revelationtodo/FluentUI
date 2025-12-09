@@ -1,4 +1,4 @@
-#include "FluFrameLessWidget.h"
+﻿#include "FluFrameLessWidget.h"
 #include <QtCore/qdatetime.h>
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 #include <QtGui/qshortcut.h>
@@ -12,6 +12,8 @@
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qfileiconprovider.h>
 #include <QtWidgets/qlabel.h>
+#include <QEvent>
+#include <QWindowStateChangeEvent>
 
 FRAMELESSHELPER_USE_NAMESPACE
 
@@ -39,6 +41,7 @@ void FluFrameLessWidget::initialize()
     // setWindowTitle(tr("FramelessHelper demo application - QWidget"));
     // setWindowIcon(QFileIconProvider().icon(QFileIconProvider::Computer));
     setAttribute(Qt::WidgetAttribute::WA_StyledBackground);
+    setAttribute(Qt::WA_ContentsMarginsRespectsSafeArea);
 
     resize(800, 600);
     m_titleBar = new StandardTitleBar(this);
@@ -65,6 +68,20 @@ void FluFrameLessWidget::initialize()
     helper->setSystemButton(m_titleBar->maximizeButton(), SystemButtonType::Maximize);
     helper->setSystemButton(m_titleBar->closeButton(), SystemButtonType::Close);
 #endif // Q_OS_MACOS
+}
+
+void FluFrameLessWidget::changeEvent(QEvent *event)
+{
+#ifndef Q_OS_MACOS
+    if (QEvent::WindowStateChange == event->type())
+    {
+        QWindowStateChangeEvent *stateEvent = dynamic_cast<QWindowStateChangeEvent *>(event);
+        if (Q_NULLPTR != stateEvent)
+        {
+            m_titleBar->maximizeButton()->setButtonType(window()->isMaximized() ? SystemButtonType::Restore : SystemButtonType::Maximize);
+        }
+    }
+#endif
 }
 
 void FluFrameLessWidget::updateStyleSheet()

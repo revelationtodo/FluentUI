@@ -3,7 +3,6 @@
 FluHSplitLine::FluHSplitLine(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
     setFixedWidth(1);
-    // FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHSplitLine.qss", this);
     onThemeChanged();
 }
 
@@ -17,12 +16,5 @@ void FluHSplitLine::paintEvent(QPaintEvent* event)
 
 void FluHSplitLine::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHSplitLine.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluHSplitLine.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluHSplitLine.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

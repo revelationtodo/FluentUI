@@ -1,12 +1,17 @@
-#include "FluShortInfoBar.h"
+﻿#include "FluShortInfoBar.h"
 #include "FluInfoBarMgr.h"
 #include <QPointer>
 
+#ifdef _DEBUG
 int FluShortInfoBar::m_count = 0;
+#endif
+
 FluShortInfoBar::FluShortInfoBar(FluShortInfoBarType infobarType, QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
+#ifdef _DEBUG
     m_count++;
     // LOG_DEBUG << "Count = " << m_count;
+#endif
     setFixedHeight(50);
 
     m_hMainLayout = new QHBoxLayout;
@@ -21,7 +26,7 @@ FluShortInfoBar::FluShortInfoBar(FluShortInfoBarType infobarType, QWidget* paren
 
     m_infoLabel = new QLabel;
     m_infoLabel->setWordWrap(true);
-    m_infoLabel->setText("A Short Essential app Message.");
+    m_infoLabel->setText(tr("A Short Essential app Message."));
     m_infoLabel->setObjectName("infoLabel");
     m_hMainLayout->addWidget(m_infoLabel, 1);
 
@@ -52,10 +57,12 @@ FluShortInfoBar::FluShortInfoBar(FluShortInfoBarType infobarType, QWidget* paren
 
 FluShortInfoBar::~FluShortInfoBar()
 {
+#ifdef _DEBUG
     m_count--;
-    LOG_DEBUG << "Count = " << m_count;
-    // disconnect();
-    // FluInfoBarMgr::getInstance()->removeInfoBar(this);
+    // LOG_DEBUG << "Count = " << m_count;
+    //  disconnect();
+    //  FluInfoBarMgr::getInstance()->removeInfoBar(this);
+#endif
 }
 
 void FluShortInfoBar::setInfoBarTypeProperty(QString infoBarType)
@@ -105,7 +112,6 @@ void FluShortInfoBar::updateInfoBarTypeProperty(FluShortInfoBarType infoBarType)
 
 void FluShortInfoBar::disappear()
 {
-    // m_nDisappearDuration = duration;
     QPointer<FluShortInfoBar> ptr(this);
     if (m_nDisappearDuration > 0 && !m_bDisappearing)
     {
@@ -143,20 +149,6 @@ void FluShortInfoBar::paintEvent(QPaintEvent* event)
 
 void FluShortInfoBar::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        // if (m_closeBtn != nullptr)
-        // {
-        m_closeBtn->setIcon(FluIconUtils::getFluentIconPixmap(FluAwesomeType::ChromeClose, FluTheme::Light));
-        // }
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluShortInfoBar.qss", this);
-    }
-    else
-    {
-        // if (m_closeBtn != nullptr)
-        // {
-        m_closeBtn->setIcon(FluIconUtils::getFluentIconPixmap(FluAwesomeType::ChromeClose, FluTheme::Dark));
-        // }
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluShortInfoBar.qss", this);
-    }
+    m_closeBtn->setIcon(FluIconUtils::getFluentIconPixmap(FluAwesomeType::ChromeClose, FluThemeUtils::getUtils()->getTheme()));
+    FluStyleSheetUitls::setQssByFileName("FluShortInfoBar.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

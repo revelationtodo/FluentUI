@@ -5,7 +5,7 @@ FluRepeatButton::FluRepeatButton(QWidget* parent /*= nullptr*/) : QPushButton(pa
     m_nClickedCount = 0;
     setFixedSize(200, 30);
     connect(this, &FluRepeatButton::clicked, [=](bool bChecked) { m_nClickedCount++; });
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluRepeatButton.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
@@ -22,12 +22,5 @@ int FluRepeatButton::getClickCount()
 
 void FluRepeatButton::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluRepeatButton.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluRepeatButton.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluRepeatButton.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

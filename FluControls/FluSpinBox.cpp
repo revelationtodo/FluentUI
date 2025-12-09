@@ -18,12 +18,5 @@ void FluSpinBox::paintEvent(QPaintEvent* event)
 
 void FluSpinBox::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSpinBox.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluSpinBox.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluSpinBox.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

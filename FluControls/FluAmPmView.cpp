@@ -54,9 +54,14 @@ FluAmPmView::FluAmPmView(int nFixedW /*= 80*/, QWidget* parent /*= nullptr*/) : 
     m_apView->setFixedWidth(nFixedW);
     setFixedWidth(nFixedW);
 
-    setAmPm("AM", "PM");
+    setAmPm(tr("AM"), tr("PM"));
     setAm(true);
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluAmPmView.qss", this);
+    onThemeChanged();
+}
+
+QString FluAmPmView::getCurrentText()
+{
+    return m_apView->currentItem()->text();
 }
 
 void FluAmPmView::setAmPm(QString am, QString pm)
@@ -110,11 +115,13 @@ void FluAmPmView::setAm(bool bAm)
     {
         m_apView->setCurrentItem(m_apView->item(1));
         m_apView->scrollToItem(m_apView->item(1), QAbstractItemView::PositionAtCenter);
+        emit currentItemChanged();
     }
     else
     {
         m_apView->setCurrentItem(m_apView->item(2));
         m_apView->scrollToItem(m_apView->item(2), QAbstractItemView::PositionAtCenter);
+        emit currentItemChanged();
     }
 }
 
@@ -126,6 +133,7 @@ void FluAmPmView::scrollUp()
     m_bAm = !m_bAm;
     m_apView->setCurrentItem(m_apView->item(1));
     m_apView->scrollToItem(m_apView->item(1), QAbstractItemView::PositionAtCenter);
+    emit currentItemChanged();
 }
 
 void FluAmPmView::scrollDown()
@@ -136,6 +144,7 @@ void FluAmPmView::scrollDown()
     m_bAm = !m_bAm;
     m_apView->setCurrentItem(m_apView->item(2));
     m_apView->scrollToItem(m_apView->item(2), QAbstractItemView::PositionAtCenter);
+    emit currentItemChanged();
 }
 
 void FluAmPmView::enterEvent(QEnterEvent* event)
@@ -191,16 +200,7 @@ void FluAmPmView::paintEvent(QPaintEvent* event)
 
 void FluAmPmView::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        m_scrollUpBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Light)));
-        m_scrollDownBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Light)));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluAmPmView.qss", this);
-    }
-    else
-    {
-        m_scrollUpBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidUp, FluTheme::Dark)));
-        m_scrollDownBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidDown, FluTheme::Dark)));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluAmPmView.qss", this);
-    }
+    m_scrollUpBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidUp, FluThemeUtils::getUtils()->getTheme())));
+    m_scrollDownBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidDown, FluThemeUtils::getUtils()->getTheme())));
+    FluStyleSheetUitls::setQssByFileName("FluAmPmView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "FluLogUtils.h"
 #include "FluThemeUtils.h"
@@ -14,6 +14,8 @@
 #include <QPainter>
 #include <QWidget>
 #include <QPainterPath>
+#include <QFileInfo>
+#include <QDir>
 
 class FluStyleSheetUitls : public QObject
 {
@@ -29,11 +31,31 @@ class FluStyleSheetUitls : public QObject
 
     static QString getQssByFileName(const std::map<QString, QString> &kvMap, const QString &fileName);
     static void setQssByFileName(const std::map<QString, QString> &kvMap, const QString &fileName, QWidget *widget);
+    static void setQssByFileName(const std::map<QString, QString> &kvMap, const QString &fileName, QWidget *widget, FluTheme theme)
+    {
+        QString qssFileName = getUtils()->getStyleSheetDir() + FluThemeUtils::getThemeName() + "/" + fileName;
+        setQssByFileName(kvMap, qssFileName, widget);
+    }
+
+    // dir/theme/filename
+    static void setQssByFileName(const QString &filename, QWidget *widget, FluTheme theme)
+    {
+#ifdef _DEBUG
+        // log styleSheetDir;
+        // QString absolutePath = QDir(m_styleSheetDir).absolutePath();
+        // LOG_DEBUG << "styleSheetDir: " << absolutePath;
+#endif
+
+        QString qssFileName = getUtils()->getStyleSheetDir() + FluThemeUtils::getThemeName() + "/" + filename;
+        setQssByFileName(qssFileName, widget);
+    }
 
     static void replaceVar(const QString &jsonVars, QString &styleSheet);
     static void replaceVar(const std::map<QString, QString> &kvMap, QString &styleSheet);
 
     static void drawBottomLineIndicator(QWidget *widget, QPainter *painter);
+
+    static void doForQrcQssText(QString &data);
 
     static FluStyleSheetUitls *getUtils();
 

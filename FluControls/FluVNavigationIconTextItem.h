@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -27,7 +27,7 @@ class FluVNavigationIconTextItem : public FluVNavigationItem
 
     FluVNavigationIconTextItem(QString text, QWidget *parent = nullptr);
 
-    FluVNavigationIconTextItem(FluVNavigationIconTextItem *item);
+    FluVNavigationIconTextItem(FluVNavigationIconTextItem *item, QWidget *parent = nullptr);
 
     ~FluVNavigationIconTextItem()
     {
@@ -79,6 +79,13 @@ class FluVNavigationIconTextItem : public FluVNavigationItem
             m_arrow->show();
     }
 
+    FluVNavigationIconTextItem *getParentItem()
+    {
+        return m_parentItem;
+    }
+
+    void setItemWidth(int nWidth);
+
     std::vector<FluVNavigationIconTextItem *> getItems();
     void getAllItems(std::vector<FluVNavigationIconTextItem *> &totalItems);
     std::vector<FluVNavigationIconTextItem *> getAllItems();
@@ -86,11 +93,20 @@ class FluVNavigationIconTextItem : public FluVNavigationItem
     void addItem(FluVNavigationIconTextItem *item);
 
     int calcItemW1Width();
+    int calcItemWidth();
     int calcItemW2Height(FluVNavigationIconTextItem *item);
 
+    void adjustItemWidth();
+    void adjustItemWidth(FluVNavigationIconTextItem *item);
     void adjustItemHeight(FluVNavigationIconTextItem *item);
 
+    void adjustFlyItemHeight(FluVNavigationFlyIconTextItem *flyItem);
+
+    void adjustFlyItemWidth(FluVNavigationFlyIconTextItem *flyItem);
+
     int getDepth();
+
+    void updateDepth(FluVNavigationIconTextItem *item);
 
     FluVNavigationIconTextItem *getRootItem();
 
@@ -171,19 +187,9 @@ class FluVNavigationIconTextItem : public FluVNavigationItem
 
     void onThemeChanged()
     {
-        // LOG_DEBUG << "called";
-        if (FluThemeUtils::isLightTheme())
-        {
-            m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, QColor(8, 8, 8)));
-            m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, QColor(8, 8, 8)));
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluVNavigationIconTextItem.qss", this);
-        }
-        else
-        {
-            m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, QColor(239, 239, 239)));
-            m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, QColor(239, 239, 239)));
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluVNavigationIconTextItem.qss", this);
-        }
+        m_iconBtn->setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluThemeUtils::getUtils()->getTheme()));
+        m_arrow->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, FluThemeUtils::getUtils()->getTheme()));
+        FluStyleSheetUitls::setQssByFileName("FluVNavigationIconTextItem.qss", this, FluThemeUtils::getUtils()->getTheme());
     }
 
   protected:

@@ -1,4 +1,4 @@
-#include "FluDatePicker.h"
+﻿#include "FluDatePicker.h"
 
 FluDatePicker::FluDatePicker(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
@@ -8,15 +8,15 @@ FluDatePicker::FluDatePicker(QWidget* parent /*= nullptr*/) : FluWidget(parent)
     setLayout(m_hMainLayout);
 
     m_monthBtn = new QPushButton;
-    m_monthBtn->setText("month");
+    m_monthBtn->setText(tr("month"));
     m_monthBtn->setObjectName("monthBtn");
 
     m_dayBtn = new QPushButton;
-    m_dayBtn->setText("dayBtn");
+    m_dayBtn->setText(tr("day"));
     m_dayBtn->setObjectName("dayBtn");
 
     m_yearBtn = new QPushButton;
-    m_yearBtn->setText("year");
+    m_yearBtn->setText(tr("year"));
     m_yearBtn->setObjectName("yearBtn");
 
     m_monthBtn->setFixedWidth(140);
@@ -28,18 +28,15 @@ FluDatePicker::FluDatePicker(QWidget* parent /*= nullptr*/) : FluWidget(parent)
     m_hMainLayout->addWidget(m_yearBtn);
 
     m_datePickerView = new FluDatePickerView;
-    m_datePickerView->setFixedWidth(300);
+    // m_datePickerView->setFixedWidth(300);
     m_datePickerView->hide();
 
     setFixedSize(300, 30);
     connect(m_monthBtn, &QPushButton::clicked, [=]() { emit clicked(); });
     connect(m_dayBtn, &QPushButton::clicked, [=]() { emit clicked(); });
+    connect(m_yearBtn, &QPushButton::clicked, [=]() { emit clicked(); });
     connect(this, &FluDatePicker::clicked, [=]() {
-        // get current time
-        LOG_DEBUG << "Called";
-        // show FluTimerPickerView
-
-        int nX = 0;
+        int nX = -8;
         int nY = height() / 2 - 180;
         QPoint gPoint = mapToGlobal(QPoint(nX, nY));
         m_datePickerView->move(gPoint.x(), gPoint.y());
@@ -47,7 +44,7 @@ FluDatePicker::FluDatePicker(QWidget* parent /*= nullptr*/) : FluWidget(parent)
     });
 
     connect(m_datePickerView, &FluDatePickerView::clickedOk, [=]() {
-        const std::vector<QString> sMonths{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        const std::vector<QString> sMonths{tr("January"), tr("February"), tr("March"), tr("April"), tr("May"), tr("June"), tr("July"), tr("August"), tr("September"), tr("October"), tr("November"), tr("December")};
 
         m_monthBtn->setText(sMonths[m_datePickerView->getMonth()]);
         QString sDay = QString::asprintf("%02d", m_datePickerView->getDay() + 1);
@@ -57,8 +54,7 @@ FluDatePicker::FluDatePicker(QWidget* parent /*= nullptr*/) : FluWidget(parent)
         m_yearBtn->setText(sYear);
     });
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluDatePicker.qss", this);
-    // connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged,  this, [=](FluTheme theme) { onThemeChanged(); });
+    onThemeChanged();
 }
 
 void FluDatePicker::mouseReleaseEvent(QMouseEvent* event)
@@ -76,12 +72,5 @@ void FluDatePicker::paintEvent(QPaintEvent* event)
 
 void FluDatePicker::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluDatePicker.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluDatePicker.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluDatePicker.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

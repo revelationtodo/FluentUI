@@ -62,11 +62,12 @@ void FluRotationButton::onThemeChanged()
     if (FluThemeUtils::isLightTheme())
     {
         setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluTheme::Light));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluRotationButton.qss", this);
+        // FluStyleSheetUitls::setQssByFileName("../StyleSheet/light/FluRotationButton.qss", this);
     }
     else
     {
         setIcon(FluIconUtils::getFluentIcon(m_awesomeType, FluTheme::Dark));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluRotationButton.qss", this);
+        // FluStyleSheetUitls::setQssByFileName("../StyleSheet/dark/FluRotationButton.qss", this);
     }
+    FluStyleSheetUitls::setQssByFileName("FluRotationButton.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

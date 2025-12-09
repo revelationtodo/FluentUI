@@ -46,7 +46,6 @@ void FluHNavigationFlyIconTextItem::setIconTextItems(std::vector<FluHNavigationI
 
 void FluHNavigationFlyIconTextItem::adjustItemWidth()
 {
-    // LOG_DEBUG << "called";
     int nMaxWidth = 0;
     for (auto item : m_items)
     {
@@ -57,22 +56,14 @@ void FluHNavigationFlyIconTextItem::adjustItemWidth()
         }
     }
 
-    int nMaxHeight = 0;
     for (auto item : m_items)
     {
         item->getWrapWidget1()->setFixedWidth(nMaxWidth);
         item->getWrapWidget2()->setFixedWidth(nMaxWidth);
-
         item->setFixedWidth(nMaxWidth);
         item->setFixedHeight(36);
-        nMaxHeight += 36;
     }
-
-    // LOG_DEBUG << "vScrollView sizeHint:" << m_vScrollView->sizeHint();
-    // LOG_DEBUG << "HFlyIconItem sizeHint:" << sizeHint();
-
-    setFixedWidth(nMaxWidth + 10);
-    // setFixedHeight(nMaxHeight + 10);
+    setFixedWidth(nMaxWidth + m_vScrollView->getMainLayout()->contentsMargins().left() + m_vScrollView->getMainLayout()->contentsMargins().right());
 }
 
 QVBoxLayout* FluHNavigationFlyIconTextItem::getMainLayout()
@@ -126,14 +117,6 @@ bool FluHNavigationFlyIconTextItem::setCloseByClickedItem()
 
 void FluHNavigationFlyIconTextItem::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHNavigationFlyIconTextItem.qss", m_vScrollView);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluHNavigationFlyIconTextItem.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluHNavigationFlyIconTextItem.qss", m_vScrollView);
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluHNavigationFlyIconTextItem.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluHNavigationFlyIconTextItem.qss", m_vScrollView, FluThemeUtils::getUtils()->getTheme());
+    FluStyleSheetUitls::setQssByFileName("FluHNavigationFlyIconTextItem.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

@@ -42,7 +42,7 @@ FluLoopView::FluLoopView(int nFixedW /*= 80*/, QWidget* parent /*= nullptr*/) : 
 
     setMaxVisibleNum(9);
     m_nVisibleMidIndex = 0;
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluLoopView.qss", this);
+    onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }
 
@@ -91,6 +91,11 @@ void FluLoopView::setAllItems(const std::vector<QString>& datas)
     m_nTotalItemCount = count();
 }
 
+QString FluLoopView::getCurrentText()
+{
+    return currentItem()->text();
+}
+
 int FluLoopView::getMaxVisibleNum()
 {
     return m_nMaxVisibleNum;
@@ -130,7 +135,7 @@ void FluLoopView::scrollDown()
     if (nNextIndex >= m_nTotalVisibleCount)
         nNextIndex = 0;
 
-    LOG_DEBUG << "Scroll down next index:" << nNextIndex;
+    // LOG_DEBUG << "Scroll down next index:" << nNextIndex;
     setVisibaleMidIndex(nNextIndex);
 }
 
@@ -139,7 +144,7 @@ void FluLoopView::scrollUp()
     int nNextIndex = m_nVisibleMidIndex - 1;
     if (nNextIndex < 0)
         nNextIndex = m_nTotalVisibleCount - 1;
-    LOG_DEBUG << "Scroll up next index:" << nNextIndex;
+    // LOG_DEBUG << "Scroll up next index:" << nNextIndex;
     setVisibaleMidIndex(nNextIndex);
 }
 
@@ -164,6 +169,7 @@ void FluLoopView::scrollTo(int nIndex)
 
 void FluLoopView::enterEvent(QEnterEvent* event)
 {
+    // LOG_DEBUG << "called";
     m_scrollUpBtn->move(0, 0);
     m_scrollDownBtn->move(0, height() - m_scrollDownBtn->height());
     m_scrollUpBtn->show();
@@ -172,6 +178,7 @@ void FluLoopView::enterEvent(QEnterEvent* event)
 
 void FluLoopView::leaveEvent(QEvent* event)
 {
+    // LOG_DEBUG << "called";
     m_scrollUpBtn->move(0, 0);
     m_scrollDownBtn->move(0, height() - m_scrollDownBtn->height());
     m_scrollUpBtn->hide();
@@ -211,12 +218,13 @@ void FluLoopView::onThemeChanged()
     {
         m_scrollUpBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidUp, FluTheme::Light)));
         m_scrollDownBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidDown, FluTheme::Light)));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluLoopView.qss", this);
+        //   FluStyleSheetUitls::setQssByFileName("../StyleSheet/light/FluLoopView.qss", this);
     }
     else
     {
         m_scrollUpBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidUp, FluTheme::Dark)));
         m_scrollDownBtn->setIcon(QIcon(FluIconUtils::getFluentIcon(FluAwesomeType::CaretSolidDown, FluTheme::Dark)));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluLoopView.qss", this);
+        // FluStyleSheetUitls::setQssByFileName("../StyleSheet/dark/FluLoopView.qss", this);
     }
+    FluStyleSheetUitls::setQssByFileName("FluLoopView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

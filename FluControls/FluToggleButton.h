@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QPushButton>
 #include <QStyle>
@@ -15,28 +15,34 @@ class FluToggleButton : public QPushButton
         m_bToggled = false;
         setProperty("toggled", false);
 
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluToggleButton.qss", this);
-        connect(this, &FluToggleButton::clicked, [=](bool bChecked) {
-            m_bToggled = !m_bToggled;
-            setProperty("toggled", m_bToggled);
-            style()->polish(this);
-            update();
-        });
+        connect(this, &FluToggleButton::clicked, [=](bool bChecked) { onToggled(); });
 
+        onThemeChanged();
         connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
     }
 
+    bool getToggled()
+    {
+        return m_bToggled;
+    }
+
+    void setToggled(bool bToggled)
+    {
+        m_bToggled = bToggled;
+    }
+
   public slots:
+    void onToggled()
+    {
+        m_bToggled = !m_bToggled;
+        setProperty("toggled", m_bToggled);
+        style()->polish(this);
+        update();
+    }
+
     void onThemeChanged()
     {
-        if (FluThemeUtils::isLightTheme())
-        {
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluToggleButton.qss", this);
-        }
-        else
-        {
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluToggleButton.qss", this);
-        }
+        FluStyleSheetUitls::setQssByFileName("FluToggleButton.qss", this, FluThemeUtils::getUtils()->getTheme());
     }
 
   protected:

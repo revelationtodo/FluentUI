@@ -86,17 +86,6 @@ class FluCalendarSelectDayView : public FluWidget
     FluCalendarMonthView* getMonthView();
 
   public slots:
-    // void onThemeChanged()
-    //  {
-    //      if (FluThemeUtils::isLightTheme())
-    //      {
-    //          FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarSelectDayView.qss", this);
-    //      }
-    //      else
-    //      {
-    //          FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarSelectDayView.qss", this);
-    //      }
-    //  }
   protected:
     QVBoxLayout* m_vMainLayout;
 

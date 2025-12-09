@@ -3,6 +3,7 @@
 #include "FluCalendarSelectMonthView.h"
 #include "FluCalendarSelectYearView.h"
 #include "FluCalendarViewTitle.h"
+#include "FluVSplitLine.h"
 
 FluCalendarView::FluCalendarView(QWidget* parent /*= nullptr*/) : FluWidget(parent)
 {
@@ -19,6 +20,8 @@ FluCalendarView::FluCalendarView(QWidget* parent /*= nullptr*/) : FluWidget(pare
     m_title = new FluCalendarViewTitle(this);
     m_vMainLayout->addWidget(m_title);
 
+    m_vMainLayout->addWidget(new FluVSplitLine, 0, Qt::AlignTop);
+
     m_sLayout = new QStackedLayout;
     m_vMainLayout->addLayout(m_sLayout);
 
@@ -33,7 +36,7 @@ FluCalendarView::FluCalendarView(QWidget* parent /*= nullptr*/) : FluWidget(pare
 
     m_viewState = FluCVS_SelectDayView;
 
-    LOG_DEBUG << m_curDate;
+    // LOG_DEBUG << m_curDate;
     m_curDate = QDate::currentDate();
     m_title->setYearMonth(m_curDate.year(), m_curDate.month());
     connect(m_title->getYearMonthBtn(), &FluPushButton::clicked, [=](bool bClicked) {
@@ -110,7 +113,7 @@ FluCalendarView::FluCalendarView(QWidget* parent /*= nullptr*/) : FluWidget(pare
 
     // setFixedWidth(300);
     setFixedSize(300, 360);
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarView.qss", this);
+    onThemeChanged();
 }
 
 void FluCalendarView::switchSelectViewState(FluCalendarViewState state)
@@ -208,13 +211,5 @@ void FluCalendarView::paintEvent(QPaintEvent* event)
 
 void FluCalendarView::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarView.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarView.qss", this);
-        //   style()->polish(this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluCalendarView.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

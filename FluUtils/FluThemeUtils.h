@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <QObject>
 
@@ -6,7 +6,8 @@ enum class FluTheme
 {
     Light,
     Dark,
-    Custom,
+    AtomOneDark,
+    _END,
 };
 
 class FluThemeUtils : public QObject
@@ -16,23 +17,13 @@ class FluThemeUtils : public QObject
     FluThemeUtils(QObject* object = nullptr);
 
   public:
-    FluTheme getTheme()
-    {
-        return m_theme;
-    }
+    FluTheme getTheme();
 
-    void setTheme(FluTheme theme)
-    {
-        m_theme = theme;
-        emit themeChanged(m_theme);
-    }
+    void setTheme(FluTheme theme);
 
-    static FluThemeUtils* getUtils()
-    {
-        if (m_themeUtils == nullptr)
-            m_themeUtils = new FluThemeUtils();
-        return m_themeUtils;
-    }
+    static QString getThemeName();
+
+    static FluThemeUtils* getUtils();
 
     static bool isLightTheme()
     {
@@ -44,9 +35,9 @@ class FluThemeUtils : public QObject
         return getUtils()->getTheme() == FluTheme::Dark;
     }
 
-    static bool isCustomTheme()
+    static bool isAtomOneDarkTheme()
     {
-        return getUtils()->getTheme() == FluTheme::Custom;
+        return getUtils()->getTheme() == FluTheme::AtomOneDark;
     }
 
     static void __init()

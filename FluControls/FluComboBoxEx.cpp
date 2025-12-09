@@ -1,4 +1,4 @@
-#include "FluComboBoxEx.h"
+﻿#include "FluComboBoxEx.h"
 
 FluComboBoxEx::FluComboBoxEx(QWidget* parent /*= nullptr*/)
     : FluWidget(parent)
@@ -31,21 +31,23 @@ FluComboBoxEx::FluComboBoxEx(QWidget* parent /*= nullptr*/)
     m_hMainLayout->addWidget(m_iconBtn);
     setFixedHeight(30);
 
-    m_menu = new FluMenu;
-
+    m_menu = new FluIndicatorRoundMenu("", FluAwesomeType::None, this);
+    m_menu->getView()->setBTSpacing(true);
     connect(m_textBtn, &QPushButton::clicked, [=](bool b) { emit clicked(); });
     connect(m_iconBtn, &QPushButton::clicked, [=](bool b) { emit clicked(); });
     connect(this, &FluComboBoxEx::clicked, [=]() {
         QPoint leftBottomPos = rect().bottomLeft();
-        leftBottomPos        = mapToGlobal(leftBottomPos);
-        leftBottomPos.setY(leftBottomPos.y() + 3);
-        m_menu->setMinimumWidth(width());
-        m_menu->exec(leftBottomPos);
+        leftBottomPos = mapToGlobal(leftBottomPos);
+        leftBottomPos.setY(leftBottomPos.y() + 1);
+
+        // get select index;
+        m_menu->setDefaultAction(m_textBtn->text());
+        m_menu->popup(leftBottomPos);
     });
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluComboBoxEx.qss", this);
+    // FluStyleSheetUitls::setQssByFileName("../StyleSheet/light/FluComboBoxEx.qss", this);
 
-    connect(m_menu, &FluMenu::triggered, [=](QAction* action) {
+    connect(m_menu, &FluRoundMenu::triggered, [=](QAction* action) {
         m_textBtn->setText(action->text());
         emit currentTextChanged(action->text());
         int  nIndex = 0;
@@ -58,8 +60,12 @@ FluComboBoxEx::FluComboBoxEx(QWidget* parent /*= nullptr*/)
 
             nIndex++;
         }
-        emit currentIndexChanged(nIndex);
+
+        setIndex(nIndex);
+        // emit currentIndexChanged(nIndex);
     });
+
+    onThemeChanged();
 }
 
 QPushButton* FluComboBoxEx::getTextBtn()
@@ -90,7 +96,8 @@ void FluComboBoxEx::setIndex(int index)
     if (index != -1)
     {
         auto action = m_menu->actions()[index];
-        text        = action->text();
+        text = action->text();
+        m_menu->setDefaultAction(index);
     }
 
     m_textBtn->setText(text);
@@ -142,18 +149,8 @@ void FluComboBoxEx::paintEvent(QPaintEvent* event)
 
 void FluComboBoxEx::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        m_iconBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, FluTheme::Light));
-        if (m_textAwesomeType != FluAwesomeType::None)
-            m_textBtn->setIcon(FluIconUtils::getFluentIcon(m_textAwesomeType, FluTheme::Light));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluComboBoxEx.qss", this);
-    }
-    else
-    {
-        m_iconBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, FluTheme::Dark));
-        if (m_textAwesomeType != FluAwesomeType::None)
-            m_textBtn->setIcon(FluIconUtils::getFluentIcon(m_textAwesomeType, FluTheme::Dark));
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluComboBoxEx.qss", this);
-    }
+    m_iconBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::ChevronDown, FluThemeUtils::getUtils()->getTheme()));
+    if (m_textAwesomeType != FluAwesomeType::None)
+        m_textBtn->setIcon(FluIconUtils::getFluentIcon(m_textAwesomeType, FluThemeUtils::getUtils()->getTheme()));
+    FluStyleSheetUitls::setQssByFileName("FluComboBoxEx.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

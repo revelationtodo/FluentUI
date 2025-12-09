@@ -8,192 +8,76 @@
 #include "../FluUtils/FluUtils.h"
 #include <QPainter>
 #include <QStyleOption>
+#include "FluTimePickerViewMask.h"
+#include "FluHSplitLine.h"
+#include "FluVSplitLine.h"
+#include <QFrame>
+#include <QGraphicsDropShadowEffect>
+#include <QApplication>
 
 class FluTimePicker24HView : public FluWidget
 {
     Q_OBJECT
+    Q_PROPERTY(QColor maskBackgroundColorEx READ getMaskBackgroundColorEx WRITE setMaskBackgroundColorEx)
+    Q_PROPERTY(QColor maskTextColorEx READ getMaskTextColorEx WRITE setMaskTextColorEx)
   public:
-    FluTimePicker24HView(bool withSecond = false, QWidget* parent = nullptr)
-        : FluWidget(parent), m_bFirstShow(true), m_bWithSecond(withSecond)
+    FluTimePicker24HView(QWidget* parent = nullptr);
+
+    void setMaskBackgroundColorEx(QColor color)
     {
-        setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
-        setAttribute(Qt::WA_TranslucentBackground);
-
-        m_vMainLayout = new QVBoxLayout;
-        m_vMainLayout->setContentsMargins(0, 0, 0, 0);
-        m_vMainLayout->setSpacing(0);
-        setLayout(m_vMainLayout);
-
-        m_hViewLayout = new QHBoxLayout;
-        // setLayout(m_hViewLayout);
-        m_vMainLayout->addLayout(m_hViewLayout);
-
-        m_hourView = new FluLoopView(100);
-        m_minuteView = new FluLoopView(100);
-
-        // set hour data;
-        std::vector<QString> datas;
-        for (int i = 0; i < 24; i++)
-        {
-            QString str = QString::asprintf("%02d", i);
-            datas.push_back(str);
-        }
-        m_hourView->setAllItems(datas);
-
-        // set minute data;
-        datas.clear();
-        for (int i = 0; i < 60; i++)
-        {
-            QString str = QString::asprintf("%02d", i);
-            datas.push_back(str);
-        }
-        m_minuteView->setAllItems(datas);
-
-        m_hViewLayout->setSpacing(0);
-        m_hViewLayout->addWidget(m_hourView);
-        m_hViewLayout->addWidget(m_minuteView);
-
-        if (withSecond)
-        {
-            m_secondView = new FluLoopView(100);
-            m_secondView->setAllItems(datas);
-            m_hViewLayout->addWidget(m_secondView);
-        }
-
-        m_hBtnLayout = new QHBoxLayout;
-        m_hBtnLayout->setContentsMargins(5, 5, 5, 5);
-
-        m_okBtn = new QPushButton;
-        m_cancelBtn = new QPushButton;
-
-        m_okBtn->setObjectName("okBtn");
-        m_cancelBtn->setObjectName("cancelBtn");
-
-        m_okBtn->setFixedHeight(40);
-        m_cancelBtn->setFixedHeight(40);
-
-        m_okBtn->setIconSize(QSize(25, 25));
-        m_okBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Accept));
-
-        m_cancelBtn->setIconSize(QSize(25, 25));
-        m_cancelBtn->setIcon(FluIconUtils::getFluentIconPixmap(FluAwesomeType::Cancel));
-
-        m_hBtnLayout->addWidget(m_okBtn);
-        m_hBtnLayout->addWidget(m_cancelBtn);
-
-        m_vMainLayout->addLayout(m_hBtnLayout);
-
-        setMinute(0);
-        setHour(0);
-
-        connect(m_okBtn, &QPushButton::clicked, [=]() {
-            updateTime();
-            emit clickedOk();
-            close();
-        });
-        connect(m_cancelBtn, &QPushButton::clicked, [=]() {
-            emit clickedCancel();
-            close();
-        });
-
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTimePicker24HView.qss", this);
+        m_mask->setBackgroundColorEx(color);
     }
 
-    int getHour()
+    QColor getMaskBackgroundColorEx()
     {
-        return m_hour;
+        return m_mask->getBackgroundColorEx();
     }
 
-    int getMinute()
+    void setMaskTextColorEx(QColor color)
     {
-        return m_minute;
+        m_mask->setTextColorEx(color);
     }
 
-    int getSecond()
+    QColor getMaskTextColorEx()
     {
-        return m_second;
+        return m_mask->getTextColorEx();
     }
 
-    void setHour(int hour)
-    {
-        m_hour = hour;
-        m_hourView->setVisibaleMidIndex(hour);
-        // m_hourView->scrollTo(hour);
-    }
+    int getHour();
 
-    void setMinute(int minute)
-    {
-        m_minute = minute;
-        m_minuteView->setVisibaleMidIndex(minute);
-        // m_hourView->scrollTo(minute);
-    }
+    int getMinute();
 
-    void setSecond(int second)
-    {
-        m_second = second;
-        m_secondView->setVisibaleMidIndex(second);
-        // m_hourView->scrollTo(minute);
-    }
+    int getSecond();
 
-    void updateTime()
-    {
-        m_hour = m_hourView->getVisibleMidIndex();
-        m_minute = m_minuteView->getVisibleMidIndex();
+    void setHour(int hour);
 
-        if (m_bWithSecond)
-        {
-            m_second = m_secondView->getVisibleMidIndex();
-        }
-    }
+    void setMinute(int minute);
 
-    void paintEvent(QPaintEvent* event)
-    {
-        QStyleOption opt;
-        opt.initFrom(this);
-        QPainter painter(this);
-        style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
-    }
+    void updateTime();
 
-    void showEvent(QShowEvent* event)
-    {
-        FluWidget::showEvent(event);
-        if (!m_bFirstShow)
-            return;
+    void setShadowEffect();
 
-        m_bFirstShow = false;
-        m_hourView->scrollTo(m_hour);
-        m_minuteView->scrollTo(m_minute);
+    void paintEvent(QPaintEvent* event);
 
-        if (m_bWithSecond)
-        {
-            m_secondView->scrollTo(m_second);
-        }
-    }
+    void showEvent(QShowEvent* event);
+
+    void resizeEvent(QResizeEvent* event);
   signals:
     void clickedOk();
     void clickedCancel();
   public slots:
-    void onThemeChanged()
-    {
-        if (FluThemeUtils::isLightTheme())
-        {
-            m_okBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Accept, FluTheme::Light));
-            m_cancelBtn->setIcon(FluIconUtils::getFluentIconPixmap(FluAwesomeType::Cancel, FluTheme::Light));
-
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTimePicker24HView.qss", this);
-        }
-        else
-        {
-            m_okBtn->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Accept, FluTheme::Dark));
-            m_cancelBtn->setIcon(FluIconUtils::getFluentIconPixmap(FluAwesomeType::Cancel, FluTheme::Dark));
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluTimePicker24HView.qss", this);
-        }
-    }
+    void onThemeChanged();
 
   protected:
+    QFrame* m_mainView;
+    QHBoxLayout* m_hMainViewLayout;
+    QGraphicsDropShadowEffect* m_shadowEffect;
+
     QVBoxLayout* m_vMainLayout;
     QHBoxLayout* m_hViewLayout;
     QHBoxLayout* m_hBtnLayout;
+
+    FluTimePickerViewMask* m_mask;
 
     FluLoopView* m_hourView;
     FluLoopView* m_minuteView;

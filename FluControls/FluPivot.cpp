@@ -14,7 +14,7 @@ FluPivot::FluPivot(QWidget* parent /*= nullptr*/) : FluWidget(parent)
     m_sLayout = new FluStackedLayout;
     m_vMainLayout->addLayout(m_sLayout);
 
-    FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluPivot.qss", this);
+    onThemeChanged();
 }
 
 void FluPivot::addPivotItem(QString key, QWidget* widget)
@@ -42,12 +42,5 @@ void FluPivot::pivotItemChanged(FluPivotTitleBarItem* item)
 
 void FluPivot::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluPivot.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluPivot.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluPivot.qss", this, FluThemeUtils::getUtils()->getTheme());
 }

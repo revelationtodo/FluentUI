@@ -28,13 +28,5 @@ class FluTriangle : public FluWidget
   public slots:
     void onThemeChanged()
     {
-        // if (FluThemeUtils::isLightTheme())
-        //{
-        //     FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluTriangle.qss", this);
-        // }
-        // else
-        //{
-        //     FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluTriangle.qss", this);
-        // }
     }
 };

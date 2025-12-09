@@ -28,7 +28,6 @@ FluSettingsLabelBox::FluSettingsLabelBox(QWidget* parent /*= nullptr*/)
     m_mainLayout->addWidget(m_versionLabel);
 
     setFixedHeight(70);
-    // FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSettingsLabelBox.qss", this);
     onThemeChanged();
 }
 
@@ -58,12 +57,5 @@ void FluSettingsLabelBox::paintEvent(QPaintEvent* event)
 
 void FluSettingsLabelBox::onThemeChanged()
 {
-    if (FluThemeUtils::isLightTheme())
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluSettingsLabelBox.qss", this);
-    }
-    else
-    {
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluSettingsLabelBox.qss", this);
-    }
+    FluStyleSheetUitls::setQssByFileName("FluSettingsLabelBox.qss", this, FluThemeUtils::getUtils()->getTheme());
 }
