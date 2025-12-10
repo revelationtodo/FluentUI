@@ -34,11 +34,10 @@ QPixmap FluIconUtils::getFluentIconPixmap(FluAwesomeType nType, QColor penColor,
     const int   realW = qRound(w * dpr);
     const int   realH = qRound(h * dpr);
 
-    QPixmap pixmap(realW, realH);
-    pixmap.fill(Qt::transparent);
-
     QFont font = getInstance()->m_fluentFont;
-    font.setPixelSize(qRound(15 * dpr));
+
+    QPixmap pixmap(realW, realH);   
+    pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
