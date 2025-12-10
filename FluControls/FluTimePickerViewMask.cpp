@@ -21,6 +21,10 @@ void FluTimePickerViewMask::addItem(QString text, int nW, int nH)
 
 void FluTimePickerViewMask::setItemText(int nIndex, QString text)
 {
+    if (nIndex >= m_items.size())
+    {
+        return;
+    }
     m_items[nIndex].m_text = text;
 }
 
@@ -29,7 +33,7 @@ void FluTimePickerViewMask::paintBackground(QPainter& painter)
     QColor backgroundColor;
     painter.setPen(Qt::NoPen);
     painter.setBrush(getBackgroundColorEx());
-    painter.drawRoundedRect(rect().adjusted(4, 0, -4, 0), 4, 4);
+    painter.drawRoundedRect(rect().adjusted(0, 0, 0, 0), 4, 4);
 }
 
 void FluTimePickerViewMask::paintText(QPainter& painter)

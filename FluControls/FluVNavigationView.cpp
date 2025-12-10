@@ -41,7 +41,7 @@ FluVNavigationView::FluVNavigationView(QWidget *parent /*= nullptr*/) : FluWidge
     m_vTopWrapLayout->addWidget(m_menuButtonItem);
 
     m_searchItem = new FluVNavigationSearchItem;
-    m_vTopWrapLayout->addWidget(m_searchItem);
+    // m_vTopWrapLayout->addWidget(m_searchItem);
 
     m_bLong = true;
     setFixedWidth(m_nViewWidth);

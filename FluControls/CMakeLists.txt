@@ -1,6 +1,8 @@
 cmake_path(GET CMAKE_CURRENT_LIST_DIR FILENAME ModName)
 string(REPLACE " " "_" ModName ${ModName})
 
+set(CMAKE_AUTOMOC ON)
+
 set(TGT ${ModName})
 message("ModName: ${ModName}")
 

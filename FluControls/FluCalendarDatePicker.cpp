@@ -11,7 +11,7 @@ FluCalendarDatePicker::FluCalendarDatePicker(QWidget* parent /*= nullptr*/) : QP
 
     setLayout(m_hMainLayout);
 
-    setFixedSize(120, 30);
+    setMinimumHeight(20);
     m_textButton->setText(tr("Pick a date"));
 
     m_iconButton->setIconSize(QSize(20, 20));

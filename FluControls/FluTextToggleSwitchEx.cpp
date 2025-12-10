@@ -14,7 +14,7 @@ FluTextToggleSwitchEx::FluTextToggleSwitchEx(QWidget* parent /*= nullptr*/) : Fl
     m_hMainLayout->addWidget(m_toggleSwithEx);
     m_hMainLayout->addWidget(m_textLabel);
 
-    setText(tr("on"), tr("off"));
+    setText(tr("ON"), tr("OFF"));
     m_textLabel->setText(m_offText);
     connect(m_toggleSwithEx, &FluToggleSwitchEx::toggled, [=](bool bChecked) {
         if (bChecked)

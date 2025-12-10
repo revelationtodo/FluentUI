@@ -1,6 +1,7 @@
 #include "FluTimePicker24HView.h"
 
-FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluWidget(parent), m_bFirstShow(true)
+FluTimePicker24HView::FluTimePicker24HView(bool withSecond /*= false*/, QWidget* parent /*= nullptr*/)
+    : FluWidget(parent), m_bFirstShow(true), m_bWithSecond(withSecond)
 {
     setWindowFlags(Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -8,14 +9,14 @@ FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluW
 
     m_hMainViewLayout = new QHBoxLayout;
     setLayout(m_hMainViewLayout);
-    m_hMainViewLayout->setContentsMargins(8, 8, 8, 8);
+    m_hMainViewLayout->setContentsMargins(0, 8, 8, 0);
 
     m_mainView = new QFrame;
     m_mainView->setObjectName("mainView");
     m_hMainViewLayout->addWidget(m_mainView);
 
     m_vMainLayout = new QVBoxLayout;
-    m_vMainLayout->setContentsMargins(4, 4, 4, 4);
+    m_vMainLayout->setContentsMargins(0, 4, 4, 0);
     m_vMainLayout->setSpacing(0);
     m_mainView->setLayout(m_vMainLayout);
 
@@ -23,10 +24,10 @@ FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluW
     // setLayout(m_hViewLayout);
     m_vMainLayout->addLayout(m_hViewLayout);
 
-    m_hourView = new FluLoopView(120);
-    m_minuteView = new FluLoopView(120);
-    m_mainView->setFixedWidth(248);
-    setFixedWidth(264);
+    m_hourView   = new FluLoopView(100);
+    m_minuteView = new FluLoopView(100);
+    m_mainView->setFixedWidth(300);
+    setFixedWidth(300);
 
     // set hour data;
     std::vector<QString> datas;
@@ -51,10 +52,18 @@ FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluW
     m_hViewLayout->addWidget(new FluHSplitLine);
     m_hViewLayout->addWidget(m_minuteView);
 
+    if (withSecond)
+    {
+        m_secondView = new FluLoopView(100);
+        m_secondView->setAllItems(datas);
+        m_hViewLayout->addWidget(new FluHSplitLine);
+        m_hViewLayout->addWidget(m_secondView);
+    }
+
     m_hBtnLayout = new QHBoxLayout;
     m_hBtnLayout->setContentsMargins(4, 4, 4, 4);
 
-    m_okBtn = new QPushButton;
+    m_okBtn     = new QPushButton;
     m_cancelBtn = new QPushButton;
 
     m_okBtn->setObjectName("okBtn");
@@ -76,13 +85,18 @@ FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluW
     m_vMainLayout->addLayout(m_hBtnLayout);
 
     m_mask = new FluTimePickerViewMask(m_mainView);
-    m_mask->addItem("", 120, 40);
-    m_mask->addItem("", 120, 40);
+    m_mask->addItem("", 100, 40);
+    m_mask->addItem("", 100, 40);
 
     setMinute(0);
     setHour(0);
 
-    setShadowEffect();
+    if (withSecond)
+    {
+        m_mask->addItem("", 100, 40);
+        setSecond(0);
+    }
+
     connect(m_okBtn, &QPushButton::clicked, [=]() {
         updateTime();
         emit clickedOk();
@@ -97,11 +111,15 @@ FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluW
 
     connect(m_minuteView, &FluLoopView::visibaleMidIndexChanged, [=](int nIndex) { m_mask->setItemText(1, m_minuteView->getCurrentText()); });
 
+    connect(m_secondView, &FluLoopView::visibaleMidIndexChanged, [=](int nIndex) { m_mask->setItemText(2, m_minuteView->getCurrentText()); });
+
     connect(m_mask, &FluTimePickerViewMask::wheelChanged, [=](int nIndex, QWheelEvent* wheelEvent) {
         if (nIndex == 0)
             QApplication::sendEvent(m_hourView->viewport(), wheelEvent);
         else if (nIndex == 1)
             QApplication::sendEvent(m_minuteView->viewport(), wheelEvent);
+        else if (nIndex == 2)
+            QApplication::sendEvent(m_secondView->viewport(), wheelEvent);
     });
 
     connect(m_mask, &FluTimePickerViewMask::enterChanged, [=](int nIndex, QEnterEvent* event) {
@@ -110,6 +128,8 @@ FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluW
             QApplication::sendEvent(m_hourView, event);
         else if (nIndex == 1)
             QApplication::sendEvent(m_minuteView, event);
+        else if (nIndex == 2)
+            QApplication::sendEvent(m_secondView, event);
     });
 
     connect(m_mask, &FluTimePickerViewMask::leaveChanged, [=](int nIndex, QEvent* event) {
@@ -118,6 +138,8 @@ FluTimePicker24HView::FluTimePicker24HView(QWidget* parent /*= nullptr*/) : FluW
             QApplication::sendEvent(m_hourView, event);
         else if (nIndex == 1)
             QApplication::sendEvent(m_minuteView, event);
+        else if (nIndex == 2)
+            QApplication::sendEvent(m_secondView, event);
     });
 
     onThemeChanged();
@@ -131,6 +153,11 @@ int FluTimePicker24HView::getHour()
 int FluTimePicker24HView::getMinute()
 {
     return m_minute;
+}
+
+int FluTimePicker24HView::getSecond()
+{
+    return m_second;
 }
 
 void FluTimePicker24HView::setHour(int hour)
@@ -149,12 +176,31 @@ void FluTimePicker24HView::setMinute(int minute)
     if (m_mask != nullptr)
         m_mask->setItemText(1, m_minuteView->getCurrentText());
     // m_hourView->scrollTo(minute);
+
+    // if (m_bWithSecond)
+    // {
+    //     m_secondView->scrollTo(m_second);
+    // }
+}
+
+void FluTimePicker24HView::setSecond(int second)
+{
+    m_second = second;
+    m_secondView->setVisibaleMidIndex(second);
+    // if (m_mask != nullptr)
+    // m_mask->setItemText(1, m_secondView->getCurrentText());
+    // m_secondView->scrollTo(second);
 }
 
 void FluTimePicker24HView::updateTime()
 {
-    m_hour = m_hourView->getVisibleMidIndex();
+    m_hour   = m_hourView->getVisibleMidIndex();
     m_minute = m_minuteView->getVisibleMidIndex();
+
+    if (m_bWithSecond)
+    {
+        m_second = m_secondView->getVisibleMidIndex();
+    }
 }
 
 void FluTimePicker24HView::setShadowEffect()

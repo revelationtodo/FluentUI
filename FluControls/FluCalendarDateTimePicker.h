@@ -57,7 +57,7 @@ class FluCalendarDateTimePicker : public QPushButton
         connect(m_textButton, &QPushButton::clicked, [=]() { onClicked(); });
         connect(m_iconButton, &QPushButton::clicked, [=]() { onClicked(); });
 
-        FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarDateTimePicker.qss", this);
+        FluStyleSheetUitls::setQssByFileName("FluCalendarDateTimePicker.qss", this, FluThemeUtils::getUtils()->getTheme());
         connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
         //  {
         //     onThemeChanged();
@@ -125,12 +125,12 @@ class FluCalendarDateTimePicker : public QPushButton
         if (FluThemeUtils::getUtils()->getTheme() == FluTheme::Light)
         {
             m_iconButton->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Calendar));
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/light/FluCalendarDateTimePicker.qss", this);
+            FluStyleSheetUitls::setQssByFileName("FluCalendarDateTimePicker.qss", this, FluThemeUtils::getUtils()->getTheme());
         }
         else
         {
             m_iconButton->setIcon(FluIconUtils::getFluentIcon(FluAwesomeType::Calendar, FluTheme::Dark));
-            FluStyleSheetUitls::setQssByFileName("/resources/qss/dark/FluCalendarDateTimePicker.qss", this);
+            FluStyleSheetUitls::setQssByFileName("FluCalendarDateTimePicker.qss", this, FluThemeUtils::getUtils()->getTheme());
         }
     }
 

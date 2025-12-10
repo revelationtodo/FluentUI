@@ -21,7 +21,7 @@ class FluTimePicker24HView : public FluWidget
     Q_PROPERTY(QColor maskBackgroundColorEx READ getMaskBackgroundColorEx WRITE setMaskBackgroundColorEx)
     Q_PROPERTY(QColor maskTextColorEx READ getMaskTextColorEx WRITE setMaskTextColorEx)
   public:
-    FluTimePicker24HView(QWidget* parent = nullptr);
+    FluTimePicker24HView(bool withSecond = false, QWidget* parent = nullptr);
 
     void setMaskBackgroundColorEx(QColor color)
     {
@@ -52,6 +52,8 @@ class FluTimePicker24HView : public FluWidget
     void setHour(int hour);
 
     void setMinute(int minute);
+
+    void setSecond(int second);
 
     void updateTime();
 

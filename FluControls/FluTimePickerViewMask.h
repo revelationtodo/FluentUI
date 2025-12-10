@@ -60,7 +60,7 @@ class FluTimePickerViewMask : public QWidget
     void wheelChanged(int nIndex, QWheelEvent* event);
 
   protected:
-    std::vector<FluTimePickerViewMaskItem> m_items;
+    std::vector<FluTimePickerViewMaskItem> m_items{};
     int m_nCurIndex;
 
     QColor m_backgroundColorEx;

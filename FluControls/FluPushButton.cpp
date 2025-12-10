@@ -3,7 +3,7 @@
 FluPushButton::FluPushButton(QWidget *parent /*= nullptr*/) : QPushButton(parent)
 {
     setPill(false);
-    setFixedSize(200, 30);
+    setMinimumHeight(20);
     onThemeChanged();
     connect(FluThemeUtils::getUtils(), &FluThemeUtils::themeChanged, this, [=](FluTheme theme) { onThemeChanged(); });
 }

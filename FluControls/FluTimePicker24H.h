@@ -15,7 +15,7 @@ class FluTimePicker24H : public FluWidget
 {
     Q_OBJECT
   public:
-    FluTimePicker24H::FluTimePicker24H(bool withSecond = false, QWidget* parent = nullptr);
+    FluTimePicker24H(bool withSecond = false, QWidget* parent = nullptr);
 
     void mouseReleaseEvent(QMouseEvent* event);
 
