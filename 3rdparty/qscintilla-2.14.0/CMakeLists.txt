@@ -38,3 +38,12 @@ else()
     set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "qscintillad")
 endif()
 
+if(MSVC)
+    get_property(_t DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+
+    foreach(tgt IN LISTS _t)
+        if(TARGET "${tgt}")
+            set_target_properties("${tgt}" PROPERTIES FOLDER Dependencies/QScintilla)
+        endif()
+    endforeach()
+endif()

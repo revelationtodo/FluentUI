@@ -327,3 +327,13 @@ if(NOT FRAMELESSHELPER_NO_SUMMARY)
     message("Disable the StandardSystemButton class (to reduce file size): ${FRAMELESSHELPER_NO_SYSTEM_BUTTON}")
     message("-----------------------------------------------------------------")
 endif()
+
+if(MSVC)
+    get_property(_t DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+
+    foreach(tgt IN LISTS _t)
+        if(TARGET "${tgt}")
+            set_target_properties("${tgt}" PROPERTIES FOLDER Dependencies/FramelessHelper)
+        endif()
+    endforeach()
+endif()

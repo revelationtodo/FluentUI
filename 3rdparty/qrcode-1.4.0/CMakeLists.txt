@@ -11,3 +11,13 @@ add_library(${TGT} STATIC
     QrCode.hpp
 )
 target_include_directories(${TGT} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(MSVC)
+    get_property(_t DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+
+    foreach(tgt IN LISTS _t)
+        if(TARGET "${tgt}")
+            set_target_properties("${tgt}" PROPERTIES FOLDER Dependencies/QrCode)
+        endif()
+    endforeach()
+endif()

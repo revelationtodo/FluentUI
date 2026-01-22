@@ -191,3 +191,13 @@ endif()
 if(NOT FRAMELESSHELPER_NO_SUMMARY)
     dump_target_info(TARGETS ${SUB_MODULE_TARGET})
 endif()
+
+if(MSVC)
+    get_property(_t DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+
+    foreach(tgt IN LISTS _t)
+        if(TARGET "${tgt}")
+            set_target_properties("${tgt}" PROPERTIES FOLDER Dependencies/FramelessHelper)
+        endif()
+    endforeach()
+endif()

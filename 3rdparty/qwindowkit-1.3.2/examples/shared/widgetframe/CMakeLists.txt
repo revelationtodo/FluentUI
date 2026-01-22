@@ -15,3 +15,13 @@ qm_configure_target(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC . ..)
+
+if(MSVC)
+    get_property(_t DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+
+    foreach(tgt IN LISTS _t)
+        if(TARGET "${tgt}")
+            set_target_properties("${tgt}" PROPERTIES FOLDER Dependencies/QWindowKit)
+        endif()
+    endforeach()
+endif()
