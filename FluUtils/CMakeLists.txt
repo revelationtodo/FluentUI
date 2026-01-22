@@ -3201,6 +3201,8 @@ if (USE_QRC)
     add_definitions(-DUSE_QRC)
 endif()
 
+set_property(TARGET ${TGT} PROPERTY FOLDER "FluentUI")
+
 target_link_libraries(${TGT}
     PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
