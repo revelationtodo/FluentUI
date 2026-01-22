@@ -805,7 +805,7 @@ if (USE_QRC)
     add_definitions(-DUSE_QRC)
 endif()
 
-set_property(TARGET ${TGT} PROPERTY FOLDER "FluentUI")
+set_target_properties(${TGT} PROPERTIES FOLDER Dependencies/FluentUI)
 
 target_link_libraries(${TGT}
     PUBLIC
